@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 2%; /* #050505 */
+    --foreground: 0 0% 98%;
+
+    --card: 0 0% 4%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 0 0% 4%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 144 95% 55%; /* #1ff976 */
+    --primary-foreground: 0 0% 2%; 
+
+    --secondary: 0 0% 8%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 60%;
+
+    --accent: 0 0% 12%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 9 95% 60%; /* #fa5538 */
+    --destructive-foreground: 0 0% 98%;
+
+    --info: 184 100% 50%; /* #00f0ff */
+
+    --border: 0 0% 12%;
+    --input: 0 0% 12%;
+    --ring: 144 95% 55%;
+    --radius: 0.5rem;
+  }
+
+  /* Sleek scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-background;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+}
+
+@layer utilities {
+  .glassmorphism {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  .neon-glow-primary {
+    box-shadow: 0 0 15px rgba(31, 249, 118, 0.15);
+  }
+  .neon-glow-danger {
+    box-shadow: 0 0 15px rgba(250, 85, 56, 0.15);
+  }
+  .neon-glow-info {
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
+  }
+}
