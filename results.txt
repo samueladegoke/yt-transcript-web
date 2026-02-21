@@ -1,0 +1,109 @@
+[ip-api.com] HTTP 407
+[*] Starting Industry-Standard Checker (MULTI-PROVIDER READY)...
+[*] Concurrency: 50 threads | Timeout: 12s
+[*] Batch complete in 11.20s
+
+SESSION      | IP              | GEO (MMDB)           | ISP                       | MOB   | H     | P     | RISK
+------------------------------------------------------------------------------------------------------------------------
+  A4gc37WB   | 41.73.12.158    | Abuja (Wuse)         | Suburban-Fiberco          | False | False | False | CLEAN
+  IsTFWuIv   | 41.73.12.158    | Abuja (Wuse)         | Suburban-Fiberco          | False | False | False | CLEAN
+  4qnVW79o   | 41.73.12.158    | Abuja (Wuse)         | Suburban-Fiberco          | False | False | False | CLEAN
+  f5cypTMO   | 41.73.12.158    | Abuja (Wuse)         | Suburban-Fiberco          | False | False | False | CLEAN
+  UWpeZrvl   | 41.73.12.158    | Abuja (Wuse)         | Suburban-Fiberco          | False | False | False | CLEAN
+  xMXQHwKN   | 41.73.12.158    | Abuja (Wuse)         | Suburban-Fiberco          | False | False | False | CLEAN
+  K0CMsUrw   | 154.113.210.110 | Abuja                | Mainone Cable Company     | False | False | False | CLEAN
+  xnaAY7Ei   | 41.242.49.115   | Abuja                | BCN                       | False | False | False | CLEAN
+  xX02Um0E   | 154.113.210.110 | Abuja                | Mainone Cable Company     | False | False | False | CLEAN
+  X3MrliMU   | 102.91.77.121   | Abuja                | MTN NIGERIA Communication | True  | True  | False | RISK
+  H0sjXnuh   | 154.113.210.110 | Abuja                | Mainone Cable Company     | False | False | False | CLEAN
+  bi2pdWIG   | 102.91.77.121   | Abuja                | MTN NIGERIA Communication | True  | True  | False | RISK
+  QsBr6NUe   | 102.91.77.121   | Abuja                | MTN NIGERIA Communication | True  | True  | False | RISK
+  IMKIWk9V   | 154.113.210.110 | Abuja                | Mainone Cable Company     | False | False | False | CLEAN
+  i09hBKyK   | 102.91.77.121   | Abuja                | MTN NIGERIA Communication | True  | True  | False | RISK
+  c4H0uUy4   | 102.91.77.121   | Abuja                | MTN NIGERIA Communication | True  | True  | False | RISK
+  CBrZGBsO   | 197.157.218.198 | Lagos                | KKON Technologies Ltd     | False | False | False | CLEAN
+  tcNL58Mm   | 197.157.218.198 | Lagos                | KKON Technologies Ltd     | False | False | False | CLEAN
+  dap2fXz9   | 102.91.77.121   | Abuja                | MTN NIGERIA Communication | True  | True  | False | RISK
+  ujwJjVla   | 41.76.65.2      | Abuja                | VOIX2                     | False | False | False | CLEAN
+  XmABRAd9   | 41.76.65.2      | Abuja                | VOIX2                     | False | False | False | CLEAN
+  3mt284Md   | 41.242.49.115   | Abuja                | BCN                       | False | False | False | CLEAN
+  ZTuLaCer   | 41.73.12.158    | Abuja (Wuse)         | Suburban-Fiberco          | False | False | False | CLEAN
+  2r2JqncL   | 41.76.65.2      | Abuja                | VOIX2                     | False | False | False | CLEAN
+  QdotKeDa   | 154.113.210.110 | Abuja                | Mainone Cable Company     | False | False | False | CLEAN
+  bZEqCfem   | 102.91.77.121   | Abuja                | MTN NIGERIA Communication | True  | True  | False | RISK
+  nI2nRmZN   | 102.91.77.121   | Abuja                | MTN NIGERIA Communication | True  | True  | False | RISK
+  VRzWcyP1   | 41.73.12.158    | Abuja (Wuse)         | Suburban-Fiberco          | False | False | False | CLEAN
+  zJNbWs8g   | 154.113.210.110 | Abuja                | Mainone Cable Company     | False | False | False | CLEAN
+  xwkpKG5h   | 154.113.210.110 | Abuja                | Mainone Cable Company     | False | False | False | CLEAN
+  LJaxUnEc   | 197.157.218.198 | Lagos                | KKON Technologies Ltd     | False | False | False | CLEAN
+  IfWMVjDs   | 102.91.77.121   | Abuja                | MTN NIGERIA Communication | True  | True  | False | RISK
+  zScCddEE   | 41.73.12.158    | Abuja (Wuse)         | Suburban-Fiberco          | False | False | False | CLEAN
+  cAHloDYY   | 197.157.218.198 | Lagos                | KKON Technologies Ltd     | False | False | False | CLEAN
+  mNLovMkb   | 41.76.65.2      | Abuja                | VOIX2                     | False | False | False | CLEAN
+  Rtadav6O   | 154.113.210.110 | Abuja                | Mainone Cable Company     | False | False | False | CLEAN
+  a4ZUuclQ   | 197.157.218.198 | Lagos                | KKON Technologies Ltd     | False | False | False | CLEAN
+  KCVz2pfZ   | 102.91.77.121   | Abuja                | MTN NIGERIA Communication | True  | True  | False | RISK
+  mP9NYxP1   | 41.242.49.115   | Abuja                | BCN                       | False | False | False | CLEAN
+  HrS3cLBU   | 102.91.77.121   | Abuja                | MTN NIGERIA Communication | True  | True  | False | RISK
+  v6rvrmgn   | 197.157.218.198 | Lagos                | KKON Technologies Ltd     | False | False | False | CLEAN
+  ZvNE3dVN   | 41.76.65.2      | Abuja                | VOIX2                     | False | False | False | CLEAN
+  yopIwxcX   | 197.157.218.198 | Lagos                | KKON Technologies Ltd     | False | False | False | CLEAN
+  sXu0P63y   | 41.73.12.158    | Abuja (Wuse)         | Suburban-Fiberco          | False | False | False | CLEAN
+  wArBD4n5   | 154.113.210.110 | Abuja                | Mainone Cable Company     | False | False | False | CLEAN
+  XQR8p5AO   | 41.76.65.2      | Abuja                | VOIX2                     | False | False | False | CLEAN
+  0686C1Ab   | 41.76.65.2      | Abuja                | VOIX2                     | False | False | False | CLEAN
+  3bTinnMB   | 102.91.77.121   | Abuja                | MTN NIGERIA Communication | True  | True  | False | RISK
+  vt3TI8zL   | 41.73.12.158    | Abuja (Wuse)         | Suburban-Fiberco          | False | False | False | CLEAN
+  Ulwfov0t   | 41.73.12.158    | Abuja (Wuse)         | Suburban-Fiberco          | False | False | False | CLEAN
+  1HwLgRZZ   | 41.76.65.2      | Abuja                | VOIX2                     | False | False | False | CLEAN
+  jVglEDYR   | 197.157.218.198 | Lagos                | KKON Technologies Ltd     | False | False | False | CLEAN
+  q27XqYf6   | 41.73.12.158    | Abuja (Wuse)         | Suburban-Fiberco          | False | False | False | CLEAN
+  sc9qnt4W   | 41.242.49.115   | Abuja                | BCN                       | False | False | False | CLEAN
+  31FwpjPB   | 41.73.12.158    | Abuja (Wuse)         | Suburban-Fiberco          | False | False | False | CLEAN
+  nx7onwZQ   | 41.73.12.158    | Abuja (Wuse)         | Suburban-Fiberco          | False | False | False | CLEAN
+  dml4eNZm   | 197.157.218.198 | Lagos                | KKON Technologies Ltd     | False | False | False | CLEAN
+  R2pScqO0   | 102.91.77.121   | Abuja                | MTN NIGERIA Communication | True  | True  | False | RISK
+  Mhst7Kjf   | 41.73.12.158    | Abuja (Wuse)         | Suburban-Fiberco          | False | False | False | CLEAN
+  sTwoqX2z   | 41.76.65.2      | Abuja                | VOIX2                     | False | False | False | CLEAN
+  EpvAJJRd   | 41.73.12.158    | Abuja (Wuse)         | Suburban-Fiberco          | False | False | False | CLEAN
+  ds0esiHa   | 41.76.65.2      | Abuja                | VOIX2                     | False | False | False | CLEAN
+  2PN9UxZf   | 102.91.77.121   | Abuja                | MTN NIGERIA Communication | True  | True  | False | RISK
+  rHTMqS6J   | 102.91.77.121   | Abuja                | MTN NIGERIA Communication | True  | True  | False | RISK
+  fcNfU4Ff   | 154.113.210.110 | Abuja                | Mainone Cable Company     | False | False | False | CLEAN
+  zthJlVYb   | 154.113.210.110 | Abuja                | Mainone Cable Company     | False | False | False | CLEAN
+  dGxMM2UB   | 102.91.77.121   | Abuja                | MTN NIGERIA Communication | True  | True  | False | RISK
+  KbnqdnnU   | 154.113.210.110 | Abuja                | Mainone Cable Company     | False | False | False | CLEAN
+  pfMRZD3u   | 102.91.77.121   | Abuja                | MTN NIGERIA Communication | True  | True  | False | RISK
+  yACU4KHs   | 197.157.218.198 | Lagos                | KKON Technologies Ltd     | False | False | False | CLEAN
+  1GWZ7SOd   | 154.113.210.110 | Abuja                | Mainone Cable Company     | False | False | False | CLEAN
+  DEHa7B71   | 102.91.77.121   | Abuja                | MTN NIGERIA Communication | True  | True  | False | RISK
+  BRPyJdDi   | 41.73.12.158    | Abuja (Wuse)         | Suburban-Fiberco          | False | False | False | CLEAN
+  rj6NmrGd   | 154.113.210.110 | Abuja                | Mainone Cable Company     | False | False | False | CLEAN
+  OEKo1QTU   | 102.91.77.121   | Abuja                | MTN NIGERIA Communication | True  | True  | False | RISK
+  OvdzEZuJ   | 197.157.218.198 | Lagos                | KKON Technologies Ltd     | False | False | False | CLEAN
+  qMV6TkOe   | 41.73.12.158    | Abuja (Wuse)         | Suburban-Fiberco          | False | False | False | CLEAN
+  WAzkrXW0   | 41.242.49.115   | Abuja                | BCN                       | False | False | False | CLEAN
+  NQG1UY5n   | 41.73.12.158    | Abuja (Wuse)         | Suburban-Fiberco          | False | False | False | CLEAN
+  YXP9kyiw   | 197.157.218.198 | Lagos                | KKON Technologies Ltd     | False | False | False | CLEAN
+  lcGLA2Wb   | 197.157.218.198 | Lagos                | KKON Technologies Ltd     | False | False | False | CLEAN
+  O8c2Zx9F   | 102.91.77.121   | Abuja                | MTN NIGERIA Communication | True  | True  | False | RISK
+  KBWNYwWd   | 102.91.77.121   | Abuja                | MTN NIGERIA Communication | True  | True  | False | RISK
+  anj1jHVu   | 197.157.218.198 | Lagos                | KKON-ABUJA                | False | False | False | CLEAN
+  TNYisI46   | 197.157.218.198 | Lagos                | KKON Technologies Ltd     | False | False | False | CLEAN
+  GY2iCYUF   | 154.113.210.110 | Abuja                | Mainone Cable Company     | False | False | False | CLEAN
+  rmptqobj   | 197.157.218.198 | Lagos                | KKON Technologies Ltd     | False | False | False | CLEAN
+  QMs5JWnv   | 41.73.12.158    | Abuja (Wuse)         | Suburban-Fiberco          | False | False | False | CLEAN
+  sQu5PZZr   | 197.157.218.198 | Lagos                | KKON Technologies Ltd     | False | False | False | CLEAN
+  B7JeB1YX   | 197.157.218.198 | Lagos                | KKON Technologies Ltd     | False | False | False | CLEAN
+  tSkSWIEF   | 102.91.77.121   | Abuja                | MTN NIGERIA Communication | True  | True  | False | RISK
+  yQ8bz70z   | 102.91.77.121   | Abuja                | MTN NIGERIA Communication | True  | True  | False | RISK
+  JTz3QlD2   | 197.157.218.198 | Lagos                | KKON Technologies Ltd     | False | False | False | CLEAN
+  O0IBHkOF   | 41.76.65.2      | Abuja                | VOIX2                     | False | False | False | CLEAN
+  S6UUGPNY   | 154.113.210.110 | Abuja                | Mainone Cable Company     | False | False | False | CLEAN
+  6huljvrG   | 41.73.12.158    | Abuja (Wuse)         | Suburban-Fiberco          | False | False | False | CLEAN
+  doogHWMx   | 41.73.12.158    | Abuja (Wuse)         | Suburban-Fiberco          | False | False | False | CLEAN
+  EZrdNGqf   | 102.91.77.121   | Abuja                | MTN NIGERIA Communication | True  | True  | False | RISK
+  XJmaxiNJ   | 41.73.12.158    | Abuja (Wuse)         | Suburban-Fiberco          | False | False | False | CLEAN
+  vyinFc9C   | 102.91.77.121   | Abuja                | MTN NIGERIA Communication | True  | True  | False | RISK
+
+[!] No Profiles matched the clean-cellular Abuja requirement in this batch.

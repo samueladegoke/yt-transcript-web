@@ -1,0 +1,65 @@
+[*] Starting Industry-Standard Checker (OFFLINE MMDB READY)...
+[*] Concurrency: 50 threads | Timeout: 12s
+[*] Batch complete in 7.80s
+
+SESSION      | IP              | GEO (MMDB)           | ISP                       | MOB   | H     | P     | RISK
+------------------------------------------------------------------------------------------------------------------------
+  3sczZd2q   | 41.184.93.30    | Lagos (Victoria Island Annex) | ipNX Nigeria Limited      | False | False | False | CLEAN
+  HMF5NgrV   | 41.184.93.30    | Lagos (Victoria Island Annex) | ipNX Nigeria Limited      | False | False | False | CLEAN
+  9hMqAnDo   | 41.184.93.30    | Lagos (Victoria Island Annex) | ipNX Nigeria Limited      | False | False | False | CLEAN
+  3OYrLrbk   | 154.118.114.58  | Abuja                | SP 118                    | True  | False | False | CLEAN
+  31daStis   | 196.216.4.2     | Abuja                | American International Sc | False | False | False | CLEAN
+  my1uyPbc   | 196.216.4.2     | Abuja                | American International Sc | False | False | False | CLEAN
+  PJi4BWdk   | 102.207.40.210  | Lagos                | Suburban Broadband Ltd    | False | False | False | CLEAN
+  AiBQKBKl   | 102.207.41.251  | Lagos                | Suburban Broadband Ltd    | False | False | False | CLEAN
+  G8mJYBx7   | 102.207.41.251  | Lagos                | Suburban Broadband Ltd    | False | False | False | CLEAN
+  VbhxtrxL   | 102.207.41.251  | Lagos                | Suburban Broadband Ltd    | False | False | False | CLEAN
+  nToF2rbw   | 102.207.41.251  | Lagos                | Suburban Broadband Ltd    | False | False | False | CLEAN
+  BosscHdP   | 102.207.40.182  | Lagos                | Suburban Broadband Ltd    | False | False | False | CLEAN
+  p7YIWoje   | 102.207.40.182  | Lagos                | Suburban Broadband Ltd    | False | False | False | CLEAN
+  zPXRL05j   | 102.207.40.182  | Lagos                | Suburban Broadband Ltd    | False | False | False | CLEAN
+  Rw7bQZce   | 41.217.206.254  | Abuja (Wuse)         | Layer3 Limited            | False | False | True  | RISK
+  5Km4Wngu   | 197.157.218.206 | Lagos                | KKON Technologies Ltd     | False | False | False | CLEAN
+  YRPLQmcB   | 197.157.218.206 | Lagos                | KKON Technologies Ltd     | False | False | False | CLEAN
+  kD7SclWu   | 197.157.218.206 | Lagos                | KKON Technologies Ltd     | False | False | False | CLEAN
+  yLwEeANo   | 197.157.218.206 | Lagos                | KKON Technologies Ltd     | False | False | False | CLEAN
+* sxBmTC17   | 154.120.125.205 | Abuja                | Spectranet Inet AB        | True  | False | False | CLEAN
+  vLjc8fFe   | 41.87.95.31     | Abuja (Maitama)      | Phase3 Telecom Limited    | False | True  | False | RISK
+  0I1AhbUu   | 41.87.95.31     | Abuja (Maitama)      | Phase3 Telecom Limited    | False | True  | False | RISK
+  oiDAApe2   | 105.112.122.13  | Jebba                | Airtel Rwanda Ltd         | True  | False | False | CLEAN
+  vQ0DQncg   | 41.87.95.48     | Abuja (Maitama)      | Phase3 Telecom Limited    | False | True  | False | RISK
+  VEJVg6mq   | 197.157.218.206 | Lagos                | KKON Technologies Ltd     | False | False | False | CLEAN
+  8ywwpi8R   | 41.87.95.31     | Abuja (Maitama)      | Phase3 Telecom Limited    | False | True  | False | RISK
+  dlm7UtNf   | 41.217.2.167    | Abuja                | SP 217                    | True  | False | False | CLEAN
+  RJSxumd7   | 41.217.206.254  | Abuja (Wuse)         | Layer3 Limited            | False | False | True  | RISK
+* 0L5Txjs9   | 197.242.123.133 | Abuja                | Spectranet Inet AB        | True  | False | False | CLEAN
+* JNA4QRPQ   | 197.242.123.133 | Abuja                | Spectranet Inet AB        | True  | False | False | CLEAN
+  mFUmrFCS   | 102.207.40.210  | Lagos                | Suburban Broadband Ltd    | False | False | False | CLEAN
+  gKVYRJlC   | 41.87.68.14     | Lagos                | Phase3 Telecom Limited    | False | True  | False | RISK
+  3UkHhvtA   | 41.87.68.14     | Lagos                | Phase3 Telecom Limited    | False | True  | False | RISK
+  ep6BHaCK   | 41.87.95.48     | Abuja (Maitama)      | Phase3 Telecom Limited    | False | True  | False | RISK
+  Hqc7PNgC   | 41.87.68.14     | Lagos                | Phase3 Telecom Limited    | False | True  | False | RISK
+* 4X0gkNLr   | 154.120.125.205 | Abuja                | Spectranet Inet AB        | True  | False | False | CLEAN
+  BKtzUFZ6   | 105.112.122.13  | Jebba                | Airtel Rwanda Ltd         | True  | False | False | CLEAN
+* lmLckgL6   | 197.242.123.133 | Abuja                | Spectranet Inet AB        | True  | False | False | CLEAN
+  P0TL2QLp   | 41.87.95.48     | Abuja (Maitama)      | Phase3 Telecom Limited    | False | True  | False | RISK
+  aieHA4CS   | 41.217.2.167    | Abuja                | SP 217                    | True  | False | False | CLEAN
+  0a2adczA   | 41.87.95.41     | Abuja (Maitama)      | Phase3 Telecom Limited    | False | True  | False | RISK
+  GTe474EY   | 160.119.124.202 | Abuja                | Dotmac Technologies Limit | False | False | False | CLEAN
+  FuXVDc7W   | FAILED          | ERROR: Expecting value: line 1 column 1 (char 0)
+  jZOgUk9L   | FAILED          | ERROR: Expecting value: line 1 column 1 (char 0)
+  LffhrziT   | 41.217.2.106    | Abuja                | SP 217                    | True  | False | False | CLEAN
+  cpKsb2lZ   | 41.217.2.106    | Abuja                | SP 217                    | True  | False | False | CLEAN
+  FLR1UIte   | 41.217.2.106    | Abuja                | SP 217                    | True  | False | False | CLEAN
+  toBoaUa7   | 41.217.2.106    | Abuja                | SP 217                    | True  | False | False | CLEAN
+  fd98Z3EW   | 41.217.2.106    | Abuja                | SP 217                    | True  | False | False | CLEAN
+  i8dhq83f   | 41.217.2.106    | Abuja                | SP 217                    | True  | False | False | CLEAN
+
+==================================================
+[*] TARGET PROFILES IDENTIFIED (ABUJA + MOBILE + CLEAN)
+==================================================
+Session: sxBmTC17 | IP: 154.120.125.205 | Carrier: Spectranet Inet AB | City: Abuja
+Session: 0L5Txjs9 | IP: 197.242.123.133 | Carrier: Spectranet Inet AB | City: Abuja
+Session: JNA4QRPQ | IP: 197.242.123.133 | Carrier: Spectranet Inet AB | City: Abuja
+Session: 4X0gkNLr | IP: 154.120.125.205 | Carrier: Spectranet Inet AB | City: Abuja
+Session: lmLckgL6 | IP: 197.242.123.133 | Carrier: Spectranet Inet AB | City: Abuja
