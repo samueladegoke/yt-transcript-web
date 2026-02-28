@@ -1,0 +1,6 @@
+name = "yt-transcript-web"
+compatibility_date = "2025-12-01"
+pages_build_output_dir = "frontend/dist"
+
+[vars]
+VITE_API_BASE_URL = "https://your-fastapi-backend.example.com"
