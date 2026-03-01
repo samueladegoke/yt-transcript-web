@@ -15,7 +15,7 @@ allowed_origins = os.getenv("ALLOWED_ORIGINS", "https://yt-transcript-web.pages.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
-    allow_methods=["*"],
+    allow_methods=['GET', 'POST'],
     allow_headers=["*"],
     allow_credentials=True,
 )

@@ -1,8 +1,9 @@
+from __future__ import annotations
+
 import os
 from dotenv import load_dotenv
 load_dotenv()
 
-from __future__ import annotations
 
 import re
 from collections import Counter
@@ -25,13 +26,18 @@ class TranscriptError(RuntimeError):
 def parse_video_id(url: str) -> str:
     parsed = urlparse(url)
     host = parsed.netloc.lower()
+    
+    # SECURITY FIX: Strict hostname validation (prevents SSRF)
+    allowed_hosts = {"youtube.com", "www.youtube.com", "youtu.be", "m.youtube.com"}
+    if host not in allowed_hosts:
+        raise TranscriptError("Invalid YouTube domain.")
 
-    if "youtu.be" in host:
+    if host == "youtu.be":
         video_id = parsed.path.strip("/").split("/")[0]
         if video_id:
             return video_id
 
-    if "youtube.com" in host:
+    if host in ("youtube.com", "www.youtube.com", "m.youtube.com"):
         if parsed.path == "/watch":
             values = parse_qs(parsed.query).get("v")
             if values and values[0]:
