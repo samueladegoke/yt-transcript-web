@@ -18,16 +18,20 @@ load_dotenv()
 
 app = FastAPI(title="YT Transcript API", version="0.1.0")
 
-# CORS: Use environment variable, default to production URL
+# CORS: Use environment variable for production, validate explicitly
 allowed_origins = os.getenv(
     "ALLOWED_ORIGINS", "https://yt-transcript-web.pages.dev"
 ).split(",")
+
+# Production hardening: strip whitespace and filter empty origins
+allowed_origins = [origin.strip() for origin in allowed_origins if origin.strip()]
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
     allow_methods=["GET", "POST"],
-    allow_headers=["*"],
-    allow_credentials=True,
+    allow_headers=["Content-Type", "Authorization"],
+    allow_credentials=False,  # Production hardening: disable credentials
 )
 
 
