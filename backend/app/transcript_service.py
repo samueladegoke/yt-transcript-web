@@ -1,3 +1,7 @@
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
 from __future__ import annotations
 
 import re
@@ -7,6 +11,11 @@ from urllib.parse import parse_qs, urlparse
 from youtube_transcript_api import NoTranscriptFound, TranscriptsDisabled, VideoUnavailable, YouTubeTranscriptApi
 
 from .models import TranscriptSegment
+
+# Proxy configuration for YouTube rate limiting
+SOCKS5_PROXY = os.getenv("SOCKS5_PROXY")
+HTTP_PROXY = os.getenv("HTTP_PROXY")
+PROXY = SOCKS5_PROXY or HTTP_PROXY
 
 
 class TranscriptError(RuntimeError):
@@ -41,7 +50,7 @@ def fetch_transcript(url: str, languages: list[str] | None = None) -> tuple[str,
     lang_candidates = languages or ["en", "en-US", "en-GB"]
 
     try:
-        raw_segments = YouTubeTranscriptApi.get_transcript(video_id, languages=lang_candidates)
+        raw_segments = YouTubeTranscriptApi.get_transcript(video_id, languages=lang_candidates, proxies={"https": PROXY} if PROXY else None)
     except (NoTranscriptFound, TranscriptsDisabled, VideoUnavailable) as exc:
         raise TranscriptError(str(exc)) from exc
     except Exception as exc:  # pragma: no cover
