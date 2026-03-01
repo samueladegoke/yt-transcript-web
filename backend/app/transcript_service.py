@@ -1,15 +1,16 @@
 from __future__ import annotations
 
 import os
-from dotenv import load_dotenv
-load_dotenv()
-
-
 import re
 from collections import Counter
 from urllib.parse import parse_qs, urlparse
 
-from youtube_transcript_api import NoTranscriptFound, TranscriptsDisabled, VideoUnavailable, YouTubeTranscriptApi
+from youtube_transcript_api import (
+    NoTranscriptFound,
+    TranscriptsDisabled,
+    VideoUnavailable,
+    YouTubeTranscriptApi,
+)
 
 from .models import TranscriptSegment
 
@@ -26,7 +27,7 @@ class TranscriptError(RuntimeError):
 def parse_video_id(url: str) -> str:
     parsed = urlparse(url)
     host = parsed.netloc.lower()
-    
+
     # SECURITY FIX: Strict hostname validation (prevents SSRF)
     allowed_hosts = {"youtube.com", "www.youtube.com", "youtu.be", "m.youtube.com"}
     if host not in allowed_hosts:
@@ -51,16 +52,24 @@ def parse_video_id(url: str) -> str:
     raise TranscriptError("Unable to parse a valid YouTube video ID from URL.")
 
 
-def fetch_transcript(url: str, languages: list[str] | None = None) -> tuple[str, list[TranscriptSegment]]:
+def fetch_transcript(
+    url: str, languages: list[str] | None = None
+) -> tuple[str, list[TranscriptSegment]]:
     video_id = parse_video_id(url)
     lang_candidates = languages or ["en", "en-US", "en-GB"]
 
     try:
-        raw_segments = YouTubeTranscriptApi.get_transcript(video_id, languages=lang_candidates, proxies={"https": PROXY} if PROXY else None)
+        raw_segments = YouTubeTranscriptApi.get_transcript(
+            video_id,
+            languages=lang_candidates,
+            proxies={"https": PROXY} if PROXY else None,
+        )
     except (NoTranscriptFound, TranscriptsDisabled, VideoUnavailable) as exc:
         raise TranscriptError(str(exc)) from exc
     except Exception as exc:  # pragma: no cover
-        raise TranscriptError("Transcript extraction failed. Try again in a moment.") from exc
+        raise TranscriptError(
+            "Transcript extraction failed. Try again in a moment."
+        ) from exc
 
     segments = [
         TranscriptSegment(
@@ -136,7 +145,10 @@ def _top_keywords(segments: list[TranscriptSegment]) -> list[str]:
 
 def to_markdown(segments: list[TranscriptSegment], title: str | None = None) -> str:
     heading = title or "YouTube Transcript"
-    summary = " ".join(seg.text for seg in segments[:3]).strip() or "Transcript extracted successfully."
+    summary = (
+        " ".join(seg.text for seg in segments[:3]).strip()
+        or "Transcript extracted successfully."
+    )
     keywords = _top_keywords(segments)
 
     lines = [f"# {heading}", "", "## Summary", "", summary, "", "## Key Takeaways", ""]
