@@ -1,3 +1,4 @@
+import os
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -9,11 +10,14 @@ from .transcript_service import TranscriptError, fetch_transcript, to_markdown, 
 
 app = FastAPI(title="YT Transcript API", version="0.1.0")
 
+# CORS: Use environment variable, default to production URL
+allowed_origins = os.getenv("ALLOWED_ORIGINS", "https://yt-transcript-web.pages.dev").split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_methods=["*"],
     allow_headers=["*"],
+    allow_credentials=True,
 )
 
 
@@ -39,3 +43,18 @@ def extract(req: ExtractRequest) -> ExtractResponse:
         plain_text=plain_text,
         markdown=markdown,
     )
+
+
+@app.post("/api/summary")
+def summarize(req: ExtractRequest) -> dict:
+    """Generate a summary of the transcript"""
+    try:
+        video_id, transcript = fetch_transcript(str(req.url))
+    except TranscriptError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    
+    # Simple extractive summary - first 5 segments
+    summary_parts = [seg["text"] for seg in transcript[:5]]
+    summary = " ".join(summary_parts)
+    
+    return {"video_id": video_id, "summary": summary}
