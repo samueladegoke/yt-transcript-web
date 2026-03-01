@@ -3,8 +3,11 @@ from __future__ import annotations
 import os
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
 
 from .models import ExtractRequest, ExtractResponse, TranscriptSegment
 from .transcript_service import (
@@ -17,6 +20,13 @@ from .transcript_service import (
 load_dotenv()
 
 app = FastAPI(title="YT Transcript API", version="0.1.0")
+
+# Rate limiter setup
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+
+# Exception handler for 429 errors
+app.add_exception_handler(429, _rate_limit_exceeded_handler)
 
 # CORS: Use environment variable for production, validate explicitly
 allowed_origins = os.getenv(
@@ -49,8 +59,9 @@ def _fetch_transcript_or_raise(url: str) -> tuple[str, list[TranscriptSegment]]:
 
 
 @app.post("/api/extract", response_model=ExtractResponse)
-def extract(req: ExtractRequest) -> ExtractResponse:
-    video_id, transcript = _fetch_transcript_or_raise(str(req.url))
+@limiter.limit("10/minute")
+def extract(request: Request, extract_req: ExtractRequest) -> ExtractResponse:
+    video_id, transcript = _fetch_transcript_or_raise(str(extract_req.url))
     plain_text = to_plain_text(transcript)
     markdown = to_markdown(transcript, title=f"Transcript: {video_id}")
 
@@ -64,9 +75,10 @@ def extract(req: ExtractRequest) -> ExtractResponse:
 
 
 @app.post("/api/summary")
-def summarize(req: ExtractRequest) -> dict:
+@limiter.limit("10/minute")
+def summarize(request: Request, extract_req: ExtractRequest) -> dict:
     """Generate a summary of the transcript"""
-    video_id, transcript = _fetch_transcript_or_raise(str(req.url))
+    video_id, transcript = _fetch_transcript_or_raise(str(extract_req.url))
 
     # Simple extractive summary - first 5 segments
     summary_parts = [seg.text for seg in transcript[:5]]
