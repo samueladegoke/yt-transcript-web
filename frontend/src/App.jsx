@@ -66,7 +66,7 @@ export default function App() {
           <p className="mt-4 max-w-2xl text-slate-300">Paste a YouTube URL to extract a time-stamped transcript and download it as plain text or markdown with summary and takeaways.</p>
 
           <form className="mt-8 flex flex-col gap-3 md:flex-row" onSubmit={onExtract}>
-            <input
+            <input id="video-url" aria-label="YouTube video URL"
               type="url"
               required
               placeholder="https://www.youtube.com/watch?v=..."
