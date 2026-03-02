@@ -59,7 +59,6 @@ def _fetch_transcript_or_raise(url: str) -> tuple[str, list[TranscriptSegment]]:
 
 
 @app.post("/api/extract", response_model=ExtractResponse)
-@limiter.limit("10/minute")
 def extract(request: Request, extract_req: ExtractRequest) -> ExtractResponse:
     video_id, transcript = _fetch_transcript_or_raise(str(extract_req.url))
     plain_text = to_plain_text(transcript)
@@ -75,7 +74,6 @@ def extract(request: Request, extract_req: ExtractRequest) -> ExtractResponse:
 
 
 @app.post("/api/summary")
-@limiter.limit("10/minute")
 def summarize(request: Request, extract_req: ExtractRequest) -> dict:
     """Generate a summary of the transcript"""
     video_id, transcript = _fetch_transcript_or_raise(str(extract_req.url))
