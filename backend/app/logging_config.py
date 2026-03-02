@@ -84,7 +84,7 @@ def setup_logging(log_level: str | None = None) -> logging.Logger:
     """
     logger = logging.getLogger("yt_transcript_api")
     level = log_level or os.getenv("LOG_LEVEL", "INFO")
-    logger.setLevel(getattr(logging, level.upper()))
+    logger.setLevel(getattr(logging, level.upper(), logging.INFO))
 
     # Remove existing handlers
     logger.handlers.clear()

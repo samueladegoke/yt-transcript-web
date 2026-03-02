@@ -12,7 +12,7 @@ from __future__ import annotations
 import os
 import re
 from collections import Counter
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs, quote, urlparse
 
 from youtube_transcript_api import YouTubeTranscriptApi
 from youtube_transcript_api._errors import (
@@ -71,8 +71,11 @@ def get_proxy_for_api() -> str | None:
         # Parse the base proxy URL
         if "@" not in _PROXY:
             # No credentials in base URL, add them
+            # URL-encode credentials to handle special characters (@, :, /, etc.)
             parsed = urlparse(_PROXY)
-            return f"{parsed.scheme}://{_PROXY_USER}:{_PROXY_PASS}@{parsed.netloc}"
+            encoded_user = quote(_PROXY_USER, safe="")
+            encoded_pass = quote(_PROXY_PASS, safe="")
+            return f"{parsed.scheme}://{encoded_user}:{encoded_pass}@{parsed.netloc}"
     
     return _PROXY
 

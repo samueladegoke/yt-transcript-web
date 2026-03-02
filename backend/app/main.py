@@ -83,19 +83,9 @@ app.state.limiter = limiter
 @app.exception_handler(RateLimitExceeded)
 async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
     """Handle rate limit exceeded with proper headers."""
-    response = JSONResponse(
-        status_code=429,
-        content={
-            "detail": "Rate limit exceeded",
-            "retry_after": exc.detail,
-        },
-    )
-    # Add rate limit headers
-    response.headers["X-RateLimit-Limit"] = str(exc.limit)
-    response.headers["X-RateLimit-Remaining"] = "0"
-    response.headers["X-RateLimit-Reset"] = str(int(exc.reset_at))
-    response.headers["Retry-After"] = str(int(exc.reset_at - exc.current))
-    return response
+    # Use slowapi's default handler to avoid accessing non-existent attributes
+    # on RateLimitExceeded (exc.limit, exc.reset_at, exc.current don't exist)
+    return await _rate_limit_exceeded_handler(request, exc)
 
 
 # =============================================================================
@@ -148,6 +138,28 @@ async def limit_request_body_size(request: Request, call_next):
                 "detail": f"Request body too large. Maximum size is {MAX_REQUEST_BODY_SIZE} bytes."
             },
         )
+    
+    # For chunked transfers (no Content-Length), read and count bytes
+    if content_length is None:
+        body = b""
+        async for chunk in request.stream():
+            body += chunk
+            if len(body) > MAX_REQUEST_BODY_SIZE:
+                return JSONResponse(
+                    status_code=413,
+                    content={
+                        "detail": f"Request body too large. Maximum size is {MAX_REQUEST_BODY_SIZE} bytes."
+                    },
+                )
+        # Reconstruct the request with the body
+        from starlette.datastructures import Headers
+        from starlette.requests import empty_receive
+        
+        # Create a new request with the body
+        async def receive():
+            return {"type": "http.request", "body": body}
+        
+        request._receive = receive
     
     return await call_next(request)
 
