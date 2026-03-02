@@ -5,23 +5,42 @@ import re
 from collections import Counter
 from urllib.parse import parse_qs, urlparse
 
-from youtube_transcript_api import (
+from youtube_transcript_api import YouTubeTranscriptApi
+from youtube_transcript_api._errors import (
     NoTranscriptFound,
     TranscriptsDisabled,
     VideoUnavailable,
-    YouTubeTranscriptApi,
+    RequestBlocked,
+    IpBlocked,
 )
+from youtube_transcript_api.proxies import GenericProxyConfig
 
 from .models import TranscriptSegment
 
 # Proxy configuration for YouTube rate limiting
 SOCKS5_PROXY = os.getenv("SOCKS5_PROXY")
 HTTP_PROXY = os.getenv("HTTP_PROXY")
-PROXY = SOCKS5_PROXY or HTTP_PROXY
+PROXY = HTTP_PROXY or SOCKS5_PROXY
 
 
 class TranscriptError(RuntimeError):
     pass
+
+
+def _create_api_with_proxy() -> YouTubeTranscriptApi:
+    """Create YouTubeTranscriptApi instance with proxy if configured."""
+    if PROXY:
+        # Support both http:// and socks5:// URLs
+        proxy_url = PROXY
+        if proxy_url.startswith("socks5://"):
+            # Convert socks5 to http format for GenericProxyConfig
+            # socks5://user:pass@host:port -> http://user:pass@host:port
+            proxy_url = "http://" + proxy_url[9:]
+        
+        proxy_config = GenericProxyConfig(http_url=proxy_url, https_url=proxy_url)
+        return YouTubeTranscriptApi(proxy_config=proxy_config)
+    
+    return YouTubeTranscriptApi()
 
 
 def parse_video_id(url: str) -> str:
@@ -59,26 +78,34 @@ def fetch_transcript(
     lang_candidates = languages or ["en", "en-US", "en-GB"]
 
     try:
-        raw_segments = YouTubeTranscriptApi.get_transcript(
-            video_id,
-            languages=lang_candidates,
-            proxies={"https": PROXY} if PROXY else None,
-        )
+        api = _create_api_with_proxy()
+        transcript = api.fetch(video_id, languages=lang_candidates)
+            
     except (NoTranscriptFound, TranscriptsDisabled, VideoUnavailable) as exc:
         raise TranscriptError(str(exc)) from exc
+    except (RequestBlocked, IpBlocked) as exc:
+        # YouTube is blocking the IP - suggest using a proxy
+        if not PROXY:
+            raise TranscriptError(
+                "YouTube is blocking requests from this IP address. "
+                "Please configure a proxy using SOCKS5_PROXY or HTTP_PROXY environment variable."
+            ) from exc
+        raise TranscriptError(
+            f"YouTube blocked the request even with proxy. Try a different proxy. Error: {exc}"
+        ) from exc
     except Exception as exc:  # pragma: no cover
         raise TranscriptError(
-            "Transcript extraction failed. Try again in a moment."
+            f"Transcript extraction failed: {exc}. Try again in a moment."
         ) from exc
 
     segments = [
         TranscriptSegment(
-            start=float(item.get("start", 0.0)),
-            duration=float(item.get("duration", 0.0)),
-            text=str(item.get("text", "")).strip(),
+            start=float(seg.start),
+            duration=float(seg.duration),
+            text=str(seg.text).strip(),
         )
-        for item in raw_segments
-        if str(item.get("text", "")).strip()
+        for seg in transcript
+        if str(seg.text).strip()
     ]
 
     if not segments:
