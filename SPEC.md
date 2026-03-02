@@ -23,5 +23,15 @@ A sleek, dark-mode web interface that allows users to paste a YouTube URL and re
 - **Anti-Bot**: Must handle YouTube rate limits using the E.T.D. proxy logic if necessary.
 - **Latency**: Sub-3 second extraction for standard length videos.
 
+## 5. Security & Compliance
+
+### Dependency Vulnerability Scanning
+- **Automated Scanning**: GitHub Dependabot scans dependencies for known vulnerabilities
+- **Schedule**: 
+  - Python packages (pip): Weekly checks
+  - GitHub Actions: Monthly checks
+- **Alerts**: Automatic PRs with vulnerability details and remediation steps
+- **Compliance**: Meets audit requirements for 30-day vulnerability detection
+
 ---
 

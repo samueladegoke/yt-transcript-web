@@ -1,0 +1,28 @@
+# Dependabot configuration for automated dependency vulnerability scanning
+# https://docs.github.com/en/code-security/dependabot
+
+version: 2
+
+updates:
+  # Check Python dependencies (pip) weekly
+  - package-ecosystem: "pip"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "pip"
+    labels:
+      - "dependencies"
+      - "security"
+    
+  # Check GitHub Actions monthly
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    commit-message:
+      prefix: "actions"
+    labels:
+      - "dependencies"
+      - "github-actions"

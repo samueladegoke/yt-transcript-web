@@ -48,3 +48,23 @@ Response includes:
 - `transcript`: list of `{ start, duration, text }`
 - `plain_text`: transcript formatted for `.txt`
 - `markdown`: transcript with summary and key takeaways for `.md`
+
+## Security
+
+### Dependency Scanning
+
+This project uses **GitHub Dependabot** for automated dependency vulnerability scanning:
+
+- **Python dependencies** (`backend/requirements.txt`): Checked weekly
+- **GitHub Actions**: Checked monthly
+
+Dependabot automatically creates pull requests when security vulnerabilities are detected in dependencies. Each PR includes:
+- Vulnerability details and severity
+- Recommended fix version
+- Links to security advisories
+
+To enable Dependabot on your repository:
+1. Go to Repository Settings → Security → Dependabot
+2. Or simply push the `.github/dependabot.yml` file — GitHub will automatically enable Dependabot
+
+For more info: https://docs.github.com/en/code-security/dependabot
