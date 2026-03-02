@@ -218,3 +218,18 @@ kilo run "Your task description"
 - [Council of Models Guidelines](obsidian-vault/03_Resources/Council-Guidelines.md)
 - [YT-POST-MVP-001 Kilo Success Report](obsidian-vault/03_Resources/YT-POST-MVP-001-Complete.md)
 - [Active Tasks Registry](factory/active-tasks.json)
+
+---
+
+## CLI Comparison Report
+
+For detailed analysis of all available CLI agents (Codex, OpenCode, Kilo), see:
+
+📄 **[CLI Comparison Report](obsidian-vault/03_Resources/CLI-Comparison-Report.md)**
+
+**Summary:**
+- **Kilo:** Most reliable, use as 1st fallback
+- **OpenCode:** Intermittent, use for research
+- **Codex:** Currently broken (401 auth errors)
+
+**Last Updated:** March 2, 2026
