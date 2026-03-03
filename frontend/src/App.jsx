@@ -167,10 +167,12 @@ function TranscriptViewer({ transcript, searchQuery, onSegmentClick }) {
 
   const highlightText = (text, query) => {
     if (!query) return text;
-    const parts = text.split(new RegExp(`(${query})`, "gi"));
+    // Escape regex special characters to prevent ReDoS
+    const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const parts = text.split(new RegExp(`(${escapedQuery})`, "gi"));
     return parts.map((part, i) =>
-      part.toLowerCase() === query.toLowerCase() ? (
-        <mark key={i} className="rounded bg-neon/30 px-1 text-white">
+      part.toLowerCase() === escapedQuery.toLowerCase() ? (
+        <mark key={i}ounded bg-neon className="r/30 px-1 text-white">
           {part}
         </mark>
       ) : (
