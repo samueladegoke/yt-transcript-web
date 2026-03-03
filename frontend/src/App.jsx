@@ -288,6 +288,13 @@ function DownloadOptions({ data }) {
   const [aiLoading, setAiLoading] = useState(null);
   const [aiResult, setAiResult] = useState(null);
 
+  const getSafeFilename = (suffix = "") => {
+    const title = data.title || "transcript";
+    const date = new Date().toISOString().split("T")[0];
+    const cleanTitle = title.replace(/[^a-z0-9]/gi, "_").toLowerCase().substring(0, 50);
+    return `${cleanTitle}_${date}${suffix}`;
+  };
+
   // Use API-provided versions when available, fallback to computed
   const transcriptWithTimestamps = data.plain_text_with_timestamps || data.transcript
     .map((seg) => `[${formatTime(seg.start)}] ${seg.text}`)
@@ -329,7 +336,7 @@ function DownloadOptions({ data }) {
     <div className="space-y-4">
       <div className="flex flex-wrap gap-2">
         <button
-          onClick={() => downloadBlob(transcriptWithTimestamps, `transcript-${data.video_id}.txt`)}
+          onClick={() => downloadBlob(transcriptWithTimestamps, `${getSafeFilename()}.txt`)}
           className="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900/50 px-4 py-2 text-sm text-slate-300 transition hover:border-electric hover:text-white"
           title="Download with timestamps"
         >
@@ -338,7 +345,7 @@ function DownloadOptions({ data }) {
         </button>
         
         <button
-          onClick={() => downloadBlob(data.plain_text, `transcript-${data.video_id}-clean.txt`)}
+          onClick={() => downloadBlob(data.plain_text, `${getSafeFilename("_clean")}.txt`)}
           className="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900/50 px-4 py-2 text-sm text-slate-300 transition hover:border-electric hover:text-white"
           title="Download clean text"
         >
@@ -347,7 +354,7 @@ function DownloadOptions({ data }) {
         </button>
         
         <button
-          onClick={() => downloadBlob(data.markdown, `transcript-${data.video_id}.md`, "text/markdown;charset=utf-8")}
+          onClick={() => downloadBlob(data.markdown, `${getSafeFilename()}.md`, "text/markdown;charset=utf-8")}
           className="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900/50 px-4 py-2 text-sm text-slate-300 transition hover:border-electric hover:text-white"
           title="Download as Markdown"
         >
@@ -397,6 +404,13 @@ function DownloadOptions({ data }) {
         >
           {aiLoading === "next_steps" ? "Loading..." : "Next Steps"}
         </button>
+        <button
+          onClick={() => handleAIAnalysis("structured_edit")}
+          disabled={aiLoading}
+          className="flex items-center gap-2 rounded-lg border border-purple-600 bg-purple-900/30 px-4 py-2 text-sm text-purple-300 transition hover:bg-purple-900/50 disabled:opacity-50"
+        >
+          {aiLoading === "structured_edit" ? "Loading..." : "Professional Edit"}
+        </button>
       </div>
 
       {/* AI Results Display */}
@@ -405,7 +419,7 @@ function DownloadOptions({ data }) {
           {aiResult.error ? (
             <p className="text-red-400">Error: {aiResult.error}</p>
           ) : (
-            <div className="space-y-2 text-sm text-slate-200">
+            <div className="space-y-4 text-sm text-slate-200">
               {aiResult.summary && (
                 <div>
                   <h4 className="font-semibold text-purple-300">Summary</h4>
@@ -424,13 +438,36 @@ function DownloadOptions({ data }) {
                   <p className="whitespace-pre-wrap">{aiResult.next_steps}</p>
                 </div>
               )}
+              {aiResult.structured_edit && (
+                <div>
+                  <div className="flex justify-between items-center mb-2 border-b border-purple-700 pb-2">
+                    <h4 className="font-semibold text-purple-300">Professional Edit</h4>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => downloadBlob(aiResult.structured_edit, `${getSafeFilename("_edited")}.txt`)}
+                        className="flex items-center gap-1 rounded border border-purple-600/50 bg-purple-900/30 px-2 py-1 text-xs text-purple-300 hover:bg-purple-900/50 transition"
+                      >
+                        <Download className="h-3 w-3" />
+                        Download .txt
+                      </button>
+                      <button
+                        onClick={() => downloadBlob(aiResult.structured_edit, `${getSafeFilename("_edited")}.md`, "text/markdown;charset=utf-8")}
+                        className="flex items-center gap-1 rounded bg-purple-600 px-2 py-1 text-xs text-white hover:bg-purple-500 transition"
+                      >
+                        <FileCode className="h-3 w-3" />
+                        Download .md
+                      </button>
+                    </div>
+                  </div>
+                  <p className="whitespace-pre-wrap leading-relaxed">{aiResult.structured_edit}</p>
+                </div>
+              )}
             </div>
           )}
         </div>
       )}
     </div>
   );
-}
 }
 
 // Main App Component
