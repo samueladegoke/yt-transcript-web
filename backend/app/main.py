@@ -329,7 +329,7 @@ async def video_info(
     title, description, channel = video_metadata
 
     # Extract links from description
-    links = extract_links_from_description(description)
+    links = extract_links(description)
 
     # Format outputs
     plain_text = to_plain_text(transcript)
