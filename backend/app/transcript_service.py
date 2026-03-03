@@ -138,14 +138,16 @@ def _create_api_with_proxy() -> YouTubeTranscriptApi:
                 "SOCKS5 proxies are not supported. "
                 "Please use HTTP_PROXY environment variable instead of SOCKS5_PROXY."
             )
-
         # Log the proxy URL with masked credentials
         logger.info(
             "Creating YouTubeTranscriptApi with proxy",
-            extra={"proxy_url": mask_proxy_url(proxy_url)},
+            extra={"proxy_url": mask_proxy_url(proxy_url)}
         )
-
-        proxy_config = GenericProxyConfig(http_url=proxy_url, https_url=proxy_url)
+        
+        proxy_config = GenericProxyConfig(
+            http_url=proxy_url, 
+            https_url=proxy_url
+        )
         return YouTubeTranscriptApi(proxy_config=proxy_config)
 
     return YouTubeTranscriptApi()
