@@ -285,6 +285,8 @@ function LinkList({ links }) {
 // Download Options Component
 function DownloadOptions({ data }) {
   const [copied, setCopied] = useState(false);
+  const [aiLoading, setAiLoading] = useState(null);
+  const [aiResult, setAiResult] = useState(null);
 
   // Use API-provided versions when available, fallback to computed
   const transcriptWithTimestamps = data.plain_text_with_timestamps || data.transcript
@@ -301,53 +303,134 @@ function DownloadOptions({ data }) {
     }
   };
 
+  const handleAIAnalysis = async (analysisType) => {
+    setAiLoading(analysisType);
+    setAiResult(null);
+    try {
+      const response = await fetch(`${API_BASE}/api/analyze`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          url: `https://youtube.com/watch?v=${data.video_id}`,
+          analysis_type: analysisType,
+        }),
+      });
+      const result = await response.json();
+      setAiResult(result);
+    } catch (err) {
+      console.error("AI analysis failed:", err);
+      setAiResult({ error: err.message });
+    } finally {
+      setAiLoading(null);
+    }
+  };
+
   return (
-    <div className="flex flex-wrap gap-2">
-      <button
-        onClick={() => downloadBlob(transcriptWithTimestamps, `transcript-${data.video_id}.txt`)}
-        className="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900/50 px-4 py-2 text-sm text-slate-300 transition hover:border-electric hover:text-white"
-        title="Download with timestamps"
-      >
-        <FileText className="h-4 w-4" />
-        TXT (with timestamps)
-      </button>
-      
-      <button
-        onClick={() => downloadBlob(data.plain_text, `transcript-${data.video_id}-clean.txt`)}
-        className="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900/50 px-4 py-2 text-sm text-slate-300 transition hover:border-electric hover:text-white"
-        title="Download clean text"
-      >
-        <FileText className="h-4 w-4" />
-        TXT (clean)
-      </button>
-      
-      <button
-        onClick={() => downloadBlob(data.markdown, `transcript-${data.video_id}.md`, "text/markdown;charset=utf-8")}
-        className="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900/50 px-4 py-2 text-sm text-slate-300 transition hover:border-electric hover:text-white"
-        title="Download as Markdown"
-      >
-        <FileCode className="h-4 w-4" />
-        Markdown
-      </button>
-      
-      <button
-        onClick={handleCopy}
-        className="flex items-center gap-2 rounded-lg bg-electric px-4 py-2 text-sm font-medium text-slate-900 transition hover:bg-blue-400"
-      >
-        {copied ? (
-          <>
-            <Check className="h-4 w-4" />
-            Copied!
-          </>
-        ) : (
-          <>
-            <Copy className="h-4 w-4" />
-            Copy to Clipboard
-          </>
-        )}
-      </button>
+    <div className="space-y-4">
+      <div className="flex flex-wrap gap-2">
+        <button
+          onClick={() => downloadBlob(transcriptWithTimestamps, `transcript-${data.video_id}.txt`)}
+          className="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900/50 px-4 py-2 text-sm text-slate-300 transition hover:border-electric hover:text-white"
+          title="Download with timestamps"
+        >
+          <FileText className="h-4 w-4" />
+          TXT (with timestamps)
+        </button>
+        
+        <button
+          onClick={() => downloadBlob(data.plain_text, `transcript-${data.video_id}-clean.txt`)}
+          className="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900/50 px-4 py-2 text-sm text-slate-300 transition hover:border-electric hover:text-white"
+          title="Download clean text"
+        >
+          <FileText className="h-4 w-4" />
+          TXT (clean)
+        </button>
+        
+        <button
+          onClick={() => downloadBlob(data.markdown, `transcript-${data.video_id}.md`, "text/markdown;charset=utf-8")}
+          className="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900/50 px-4 py-2 text-sm text-slate-300 transition hover:border-electric hover:text-white"
+          title="Download as Markdown"
+        >
+          <FileCode className="h-4 w-4" />
+          Markdown
+        </button>
+        
+        <button
+          onClick={handleCopy}
+          className="flex items-center gap-2 rounded-lg bg-electric px-4 py-2 text-sm font-medium text-slate-900 transition hover:bg-blue-400"
+        >
+          {copied ? (
+            <>
+              <Check className="h-4 w-4" />
+              Copied!
+            </>
+          ) : (
+            <>
+              <Copy className="h-4 w-4" />
+              Copy to Clipboard
+            </>
+          )}
+        </button>
+      </div>
+
+      {/* AI Analysis Section */}
+      <div className="flex flex-wrap gap-2 border-t border-slate-700 pt-4">
+        <span className="text-sm text-slate-400 self-center mr-2">AI:</span>
+        <button
+          onClick={() => handleAIAnalysis("summary")}
+          disabled={aiLoading}
+          className="flex items-center gap-2 rounded-lg border border-purple-600 bg-purple-900/30 px-4 py-2 text-sm text-purple-300 transition hover:bg-purple-900/50 disabled:opacity-50"
+        >
+          {aiLoading === "summary" ? "Loading..." : "Summary"}
+        </button>
+        <button
+          onClick={() => handleAIAnalysis("action_points")}
+          disabled={aiLoading}
+          className="flex items-center gap-2 rounded-lg border border-purple-600 bg-purple-900/30 px-4 py-2 text-sm text-purple-300 transition hover:bg-purple-900/50 disabled:opacity-50"
+        >
+          {aiLoading === "action_points" ? "Loading..." : "Action Points"}
+        </button>
+        <button
+          onClick={() => handleAIAnalysis("next_steps")}
+          disabled={aiLoading}
+          className="flex items-center gap-2 rounded-lg border border-purple-600 bg-purple-900/30 px-4 py-2 text-sm text-purple-300 transition hover:bg-purple-900/50 disabled:opacity-50"
+        >
+          {aiLoading === "next_steps" ? "Loading..." : "Next Steps"}
+        </button>
+      </div>
+
+      {/* AI Results Display */}
+      {aiResult && (
+        <div className="rounded-lg border border-purple-600 bg-purple-900/20 p-4">
+          {aiResult.error ? (
+            <p className="text-red-400">Error: {aiResult.error}</p>
+          ) : (
+            <div className="space-y-2 text-sm text-slate-200">
+              {aiResult.summary && (
+                <div>
+                  <h4 className="font-semibold text-purple-300">Summary</h4>
+                  <p className="whitespace-pre-wrap">{aiResult.summary}</p>
+                </div>
+              )}
+              {aiResult.action_points && (
+                <div>
+                  <h4 className="font-semibold text-purple-300">Action Points</h4>
+                  <p className="whitespace-pre-wrap">{aiResult.action_points}</p>
+                </div>
+              )}
+              {aiResult.next_steps && (
+                <div>
+                  <h4 className="font-semibold text-purple-300">Next Steps</h4>
+                  <p className="whitespace-pre-wrap">{aiResult.next_steps}</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
+}
 }
 
 // Main App Component
