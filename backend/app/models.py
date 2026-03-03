@@ -25,18 +25,20 @@ from pydantic import (
 VIDEO_ID_PATTERN = re.compile(r"^[a-zA-Z0-9_-]{11}$")
 
 # Allowed YouTube hostnames
-ALLOWED_YOUTUBE_HOSTS = frozenset({
-    "youtube.com",
-    "www.youtube.com",
-    "m.youtube.com",
-    "youtu.be",
-})
+ALLOWED_YOUTUBE_HOSTS = frozenset(
+    {
+        "youtube.com",
+        "www.youtube.com",
+        "m.youtube.com",
+        "youtu.be",
+    }
+)
 
 
 class ExtractRequest(BaseModel):
     """
     Request model for transcript extraction.
-    
+
     Validators:
     - URL must be max 500 characters
     - URL must be a valid YouTube URL (hostname validation)
@@ -68,39 +70,36 @@ class ExtractRequest(BaseModel):
     def validate_youtube_url_structure(self) -> ExtractRequest:
         """Additional validation for YouTube URL structure."""
         url_str = str(self.url)
-        
+
         # Must contain youtube.com, youtu.be, or youtu.be
-        has_valid_domain = (
-            "youtube.com" in url_str 
-            or "youtu.be" in url_str
-        )
+        has_valid_domain = "youtube.com" in url_str or "youtu.be" in url_str
         if not has_valid_domain:
             raise ValueError("URL must be a valid YouTube video URL")
-        
+
         return self
 
 
 def validate_video_id_format(video_id: str) -> str:
     """
     Validate video ID format.
-    
+
     Video ID must be:
     - Exactly 11 characters
     - Contains only alphanumeric characters, underscore, or hyphen
-    
+
     Raises ValueError if invalid.
     """
     if not video_id:
         raise ValueError("Video ID cannot be empty")
-    
+
     if len(video_id) != 11:
         raise ValueError(f"Video ID must be exactly 11 characters, got {len(video_id)}")
-    
+
     if not VIDEO_ID_PATTERN.match(video_id):
         raise ValueError(
             "Video ID must contain only alphanumeric characters, underscores, or hyphens"
         )
-    
+
     return video_id
 
 
@@ -115,4 +114,23 @@ class ExtractResponse(BaseModel):
     title: str | None = None
     transcript: list[TranscriptSegment]
     plain_text: str
+    markdown: str
+
+
+class VideoInfoRequest(BaseModel):
+    """Request model for video info extraction."""
+
+    url: HttpUrl
+
+
+class VideoInfoResponse(BaseModel):
+    """Response model for /api/video-info endpoint."""
+
+    video_id: str
+    title: str
+    description: str
+    channel: str
+    transcript: list[TranscriptSegment]
+    plain_text: str
+    links: list[str]
     markdown: str
