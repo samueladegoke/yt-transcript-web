@@ -290,9 +290,8 @@ async def video_info(
         return await loop.run_in_executor(None, fetch_transcript, str(extract_req.url))
 
     async def fetch_video_info_async():
-        """Run YouTube API call in thread pool (blocking I/O)."""
-        loop = asyncio.get_event_loop()
-        return await loop.run_in_executor(None, fetch_video_info, video_id)
+        """Fetch video info directly (already async)."""
+        return await fetch_video_info(video_id)
 
     try:
         # Run both fetches in parallel
@@ -330,7 +329,7 @@ async def video_info(
     title, description, channel = video_metadata
 
     # Extract links from description
-    links = extract_links_from_description(description)
+    links = extract_links(description)
 
     # Format outputs
     plain_text = to_plain_text(transcript)
