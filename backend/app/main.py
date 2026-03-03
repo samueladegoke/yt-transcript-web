@@ -32,6 +32,8 @@ from .middleware import (
     create_logging_extra,
 )
 from .models import (
+    AnalyzeRequest,
+    AnalyzeResponse,
     ExtractRequest,
     ExtractResponse,
     TranscriptSegment,
@@ -225,7 +227,9 @@ def extract(request: Request, extract_req: ExtractRequest) -> ExtractResponse:
 
     video_id, transcript = _fetch_transcript_or_raise(str(extract_req.url), request)
     plain_text = to_plain_text(transcript)  # Clean without timestamps
-    plain_text_with_timestamps = to_plain_text(transcript, include_timestamps=True)  # With timestamps
+    plain_text_with_timestamps = to_plain_text(
+        transcript, include_timestamps=True
+    )  # With timestamps
     markdown = to_markdown(transcript, title=f"Transcript: {video_id}")
 
     return ExtractResponse(
@@ -335,7 +339,9 @@ async def video_info(
 
     # Format outputs
     plain_text = to_plain_text(transcript)  # Clean without timestamps
-    plain_text_with_timestamps = to_plain_text(transcript, include_timestamps=True)  # With timestamps
+    plain_text_with_timestamps = to_plain_text(
+        transcript, include_timestamps=True
+    )  # With timestamps
     markdown = to_markdown(transcript, title=f"Transcript: {title}")
 
     return VideoInfoResponse(
@@ -348,4 +354,233 @@ async def video_info(
         plain_text_with_timestamps=plain_text_with_timestamps,
         links=links,
         markdown=markdown,
+    )
+
+
+# =============================================================================
+# AI Analysis Endpoint
+# =============================================================================
+
+
+KILO_API_URL = "https://integrate.api.nvidia.com/v1/chat/completions"
+KILO_MODEL = "qwen/qwen3.5-397b-a17b"
+
+
+async def call_kilo_api(prompt: str, analysis_type: str) -> str:
+    """Call Kilo auto-free model API for AI analysis."""
+    import aiohttp
+
+    system_prompt = {
+        "summary": "You are a helpful assistant that creates concise summaries of video transcripts.",
+        "action_points": "You are a helpful assistant that extracts actionable points from video transcripts.",
+        "next_steps": "You are a helpful assistant that suggests next steps based on video transcripts.",
+        "all": "You are a helpful assistant that provides summary, action points, and next steps from video transcripts.",
+    }.get(analysis_type, "You are a helpful assistant.")
+
+    import os
+
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": prompt},
+    ]
+
+    # Get API key from environment
+    api_key = "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"
+    headers = {}
+    if api_key:
+        headers["Authorization"] = f"Bearer {api_key}"
+        headers["HTTP-Referer"] = "https://yt-transcript-web.pages.dev"
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                KILO_API_URL,
+                json={
+                    "model": KILO_MODEL,
+                    "messages": messages,
+                    "max_tokens": 2000,
+                },
+                headers=headers,
+                timeout=aiohttp.ClientTimeout(total=60),
+            ) as response:
+                if response.status != 200:
+                    error_text = await response.text()
+                    logger.warning(f"Kilo API error: {response.status} - {error_text}")
+                    raise HTTPException(
+                        status_code=502,
+                        detail=f"AI service unavailable: {response.status}",
+                    )
+
+                result = await response.json()
+                return result["choices"][0]["message"]["content"]
+    except aiohttp.ClientError as exc:
+        logger.warning(f"Kilo API connection error: {exc}")
+        raise HTTPException(
+            status_code=502, detail="AI service unavailable. Please try again later."
+        ) from exc
+
+
+def build_analysis_prompt(
+    transcript: str,
+    description: str | None,
+    links: list[str],
+    analysis_type: str,
+) -> str:
+    """Build the prompt for AI analysis based on analysis type."""
+    context_parts = [f"Transcript:\n{transcript}"]
+
+    if description:
+        context_parts.append(f"\nVideo Description:\n{description}")
+
+    if links:
+        context_parts.append(
+            f"\nLinks from description:\n" + "\n".join(f"- {link}" for link in links)
+        )
+
+    context = "\n".join(context_parts)
+
+    if analysis_type == "summary":
+        return f"""{context}
+
+Please provide a concise summary of this video content (2-4 paragraphs)."""
+    elif analysis_type == "action_points":
+        return f"""{context}
+
+Please extract the key actionable points from this video. Format as a bulleted list."""
+    elif analysis_type == "next_steps":
+        return f"""{context}
+
+Based on this video content, what are the recommended next steps? Format as a numbered list."""
+    else:  # "all"
+        return f"""{context}
+
+Please provide:
+1. A concise summary (2-4 paragraphs)
+2. Key action points (bulleted list)
+3. Recommended next steps (numbered list)
+
+Format your response clearly with headings."""
+
+
+@app.post("/api/analyze", response_model=AnalyzeResponse)
+@limiter.limit("5/minute")  # Stricter rate limit for AI endpoint
+async def analyze(request: Request, analyze_req: AnalyzeRequest) -> AnalyzeResponse:
+    """
+    Analyze video transcript using AI (Kilo auto-free model).
+
+    Supports analysis types: summary, action_points, next_steps, all
+    Rate limited to 5 requests per minute per IP.
+    """
+    import asyncio
+
+    extra = create_logging_extra(request)
+
+    logger.info(
+        "Analyze request received",
+        extra={
+            **extra,
+            "url": str(analyze_req.url),
+            "analysis_type": analyze_req.analysis_type,
+        },
+    )
+
+    # Get video ID
+    from .transcript_service import parse_video_id
+
+    video_id = parse_video_id(str(analyze_req.url))
+
+    # Fetch video info and transcript in parallel
+    async def fetch_transcript_async():
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, fetch_transcript, str(analyze_req.url))
+
+    async def fetch_video_info_async():
+        return await fetch_video_info(video_id)
+
+    try:
+        transcript_result, video_metadata = await asyncio.gather(
+            fetch_transcript_async(), fetch_video_info_async(), return_exceptions=True
+        )
+    except Exception as exc:
+        logger.warning(
+            f"Parallel fetch error: {exc}", extra={**extra, "url": str(analyze_req.url)}
+        )
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    # Handle transcript errors
+    if isinstance(transcript_result, Exception):
+        logger.warning(f"Transcript fetch error: {transcript_result}", extra={**extra})
+        raise HTTPException(
+            status_code=400, detail=str(transcript_result)
+        ) from transcript_result
+
+    # Handle video info errors
+    if isinstance(video_metadata, Exception):
+        logger.warning(f"Video info fetch error: {video_metadata}", extra={**extra})
+        raise HTTPException(
+            status_code=400, detail=str(video_metadata)
+        ) from video_metadata
+
+    # Unpack results
+    _, transcript = transcript_result
+    title, description, channel = video_metadata
+
+    # Extract links from description
+    links = extract_links(description) if description else []
+
+    # Get plain text transcript
+    plain_text = to_plain_text(transcript)
+
+    # Build prompt and call AI
+    prompt = build_analysis_prompt(
+        plain_text, description, links, analyze_req.analysis_type
+    )
+
+    ai_result = await call_kilo_api(prompt, analyze_req.analysis_type)
+
+    # Parse AI result based on analysis type
+    summary = None
+    action_points = None
+    next_steps = None
+
+    if analyze_req.analysis_type in ("summary", "all"):
+        summary = ai_result
+    elif analyze_req.analysis_type == "action_points":
+        action_points = ai_result
+    elif analyze_req.analysis_type == "next_steps":
+        next_steps = ai_result
+    else:
+        # Parse "all" response - look for sections
+        current_section = "summary"
+        summary_parts = []
+        action_parts = []
+        next_parts = []
+
+        for line in ai_result.split("\n"):
+            line_lower = line.lower().strip()
+            if "summary" in line_lower and ":" in line:
+                current_section = "summary"
+                continue
+            elif "action" in line_lower and "point" in line_lower:
+                current_section = "action_points"
+                continue
+            elif "next step" in line_lower or "next steps" in line_lower:
+                current_section = "next_steps"
+                continue
+
+            if current_section == "summary":
+                summary_parts.append(line)
+            elif current_section == "action_points":
+                action_parts.append(line)
+            else:
+                next_parts.append(line)
+
+        summary = "\n".join(summary_parts).strip() if summary_parts else ai_result
+        action_points = "\n".join(action_parts).strip() if action_parts else None
+        next_steps = "\n".join(next_parts).strip() if next_parts else None
+
+    return AnalyzeResponse(
+        summary=summary,
+        action_points=action_points,
+        next_steps=next_steps,
     )
