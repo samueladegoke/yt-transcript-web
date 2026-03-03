@@ -286,11 +286,10 @@ function LinkList({ links }) {
 function DownloadOptions({ data }) {
   const [copied, setCopied] = useState(false);
 
-  const transcriptWithTimestamps = useMemo(() => {
-    return data.transcript
-      .map((seg) => `[${formatTime(seg.start)}] ${seg.text}`)
-      .join("\n");
-  }, [data.transcript]);
+  // Use API-provided versions when available, fallback to computed
+  const transcriptWithTimestamps = data.plain_text_with_timestamps || data.transcript
+    .map((seg) => `[${formatTime(seg.start)}] ${seg.text}`)
+    .join("\n");
 
   const handleCopy = async () => {
     try {

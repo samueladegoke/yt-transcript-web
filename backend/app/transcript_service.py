@@ -379,8 +379,18 @@ def format_seconds(seconds: float) -> str:
     return f"{m:02}:{s:02}"
 
 
-def to_plain_text(segments: list[TranscriptSegment]) -> str:
-    return "\n".join(f"[{format_seconds(seg.start)}] {seg.text}" for seg in segments)
+def to_plain_text(segments: list[TranscriptSegment], include_timestamps: bool = False) -> str:
+    """Convert transcript to plain text.
+    
+    Args:
+        segments: List of transcript segments
+        include_timestamps: If True, include timestamps in format [00:00]; if False, return clean text
+    """
+    if include_timestamps:
+        return "\n".join(f"[{format_seconds(seg.start)}] {seg.text}" for seg in segments)
+    else:
+        # Clean text without timestamps
+        return "\n".join(seg.text for seg in segments)
 
 
 def _top_keywords(segments: list[TranscriptSegment]) -> list[str]:

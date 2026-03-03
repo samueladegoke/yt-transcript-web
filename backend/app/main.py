@@ -224,7 +224,8 @@ def extract(request: Request, extract_req: ExtractRequest) -> ExtractResponse:
     )
 
     video_id, transcript = _fetch_transcript_or_raise(str(extract_req.url), request)
-    plain_text = to_plain_text(transcript)
+    plain_text = to_plain_text(transcript)  # Clean without timestamps
+    plain_text_with_timestamps = to_plain_text(transcript, include_timestamps=True)  # With timestamps
     markdown = to_markdown(transcript, title=f"Transcript: {video_id}")
 
     return ExtractResponse(
@@ -232,6 +233,7 @@ def extract(request: Request, extract_req: ExtractRequest) -> ExtractResponse:
         title=f"Transcript: {video_id}",
         transcript=transcript,
         plain_text=plain_text,
+        plain_text_with_timestamps=plain_text_with_timestamps,
         markdown=markdown,
     )
 
@@ -332,7 +334,8 @@ async def video_info(
     links = extract_links(description)
 
     # Format outputs
-    plain_text = to_plain_text(transcript)
+    plain_text = to_plain_text(transcript)  # Clean without timestamps
+    plain_text_with_timestamps = to_plain_text(transcript, include_timestamps=True)  # With timestamps
     markdown = to_markdown(transcript, title=f"Transcript: {title}")
 
     return VideoInfoResponse(
@@ -342,6 +345,7 @@ async def video_info(
         channel=channel,
         transcript=transcript,
         plain_text=plain_text,
+        plain_text_with_timestamps=plain_text_with_timestamps,
         links=links,
         markdown=markdown,
     )

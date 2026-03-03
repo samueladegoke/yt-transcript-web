@@ -113,7 +113,8 @@ class ExtractResponse(BaseModel):
     video_id: str
     title: str | None = None
     transcript: list[TranscriptSegment]
-    plain_text: str
+    plain_text: str  # Clean without timestamps
+    plain_text_with_timestamps: str | None = None  # With timestamps for download option
     markdown: str
 
 
@@ -131,6 +132,7 @@ class VideoInfoResponse(BaseModel):
     description: str
     channel: str
     transcript: list[TranscriptSegment]
-    plain_text: str
+    plain_text: str  # Clean without timestamps
+    plain_text_with_timestamps: str | None = None  # With timestamps
     links: list[str]
     markdown: str
