@@ -148,7 +148,7 @@ class AnalyzeRequest(BaseModel):
     @classmethod
     def validate_analysis_type(cls, v: str) -> str:
         """Validate analysis_type is one of the allowed values."""
-        allowed = {"summary", "action_points", "next_steps", "all"}
+        allowed = {"summary", "action_points", "next_steps", "structured_edit", "all"}
         if v not in allowed:
             raise ValueError(f"analysis_type must be one of: {', '.join(allowed)}")
         return v
@@ -160,3 +160,4 @@ class AnalyzeResponse(BaseModel):
     summary: str | None = None
     action_points: str | None = None
     next_steps: str | None = None
+    structured_edit: str | None = None

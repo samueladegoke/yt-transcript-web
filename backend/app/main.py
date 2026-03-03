@@ -363,7 +363,7 @@ async def video_info(
 
 
 KILO_API_URL = "https://integrate.api.nvidia.com/v1/chat/completions"
-KILO_MODEL = "qwen/qwen3.5-397b-a17b"
+KILO_MODEL = "meta/llama-4-maverick-17b-128e-instruct"
 
 
 async def call_kilo_api(prompt: str, analysis_type: str) -> str:
@@ -374,6 +374,7 @@ async def call_kilo_api(prompt: str, analysis_type: str) -> str:
         "summary": "You are a helpful assistant that creates concise summaries of video transcripts.",
         "action_points": "You are a helpful assistant that extracts actionable points from video transcripts.",
         "next_steps": "You are a helpful assistant that suggests next steps based on video transcripts.",
+        "structured_edit": "You are a professional editor. Your task is to structure the transcript into a coherent document with proper paragraphs and punctuation, ensuring no words or letters are lost from the original text.",
         "all": "You are a helpful assistant that provides summary, action points, and next steps from video transcripts.",
     }.get(analysis_type, "You are a helpful assistant.")
 
@@ -401,7 +402,7 @@ async def call_kilo_api(prompt: str, analysis_type: str) -> str:
                     "max_tokens": 2000,
                 },
                 headers=headers,
-                timeout=aiohttp.ClientTimeout(total=60),
+                timeout=aiohttp.ClientTimeout(total=300),
             ) as response:
                 if response.status != 200:
                     error_text = await response.text()
@@ -451,6 +452,31 @@ Please extract the key actionable points from this video. Format as a bulleted l
         return f"""{context}
 
 Based on this video content, what are the recommended next steps? Format as a numbered list."""
+    elif analysis_type == "structured_edit":
+        return f"""{context}
+
+You are a Professional Editor. Please process the provided transcript into a comprehensive, master-level document optimized for AI Agent consumption. 
+
+Follow these specific tasks and formatting rules:
+
+1. PROFESSIONAL EDIT TRANSCRIPT: Re-structure the verbatim transcript into logical paragraphs with correct punctuation and capitalization. DO NOT lose or change any words, phrases, or letters from the original text.
+2. SUMMARY: Provide a concise 2-4 paragraph summary of the content.
+3. ACTION POINTS: Extract the key actionable points as a bulleted list.
+4. NEXT STEPS: Provide recommended next steps based on the content as a numbered list.
+
+Format the output using clear Markdown headers (##):
+
+## PROFESSIONAL EDIT TRANSCRIPT
+[Your verbatim restructured transcript here]
+
+## SUMMARY
+[Your summary here]
+
+## ACTION POINTS
+[Your action points here]
+
+## NEXT STEPS
+[Your next steps here]"""
     else:  # "all"
         return f"""{context}
 
@@ -542,6 +568,7 @@ async def analyze(request: Request, analyze_req: AnalyzeRequest) -> AnalyzeRespo
     summary = None
     action_points = None
     next_steps = None
+    structured_edit = None
 
     if analyze_req.analysis_type in ("summary", "all"):
         summary = ai_result
@@ -549,6 +576,26 @@ async def analyze(request: Request, analyze_req: AnalyzeRequest) -> AnalyzeRespo
         action_points = ai_result
     elif analyze_req.analysis_type == "next_steps":
         next_steps = ai_result
+    elif analyze_req.analysis_type == "structured_edit":
+        from datetime import datetime
+        # Agent-friendly structure with YAML frontmatter
+        frontmatter = "---\n"
+        frontmatter += f"title: \"{title}\"\n"
+        frontmatter += f"video_id: \"{video_id}\"\n"
+        frontmatter += f"channel: \"{channel}\"\n"
+        frontmatter += f"date_extracted: \"{datetime.now().isoformat()}\"\n"
+        frontmatter += "---\n\n"
+        
+        doc_header = f"# {title}\n\n"
+        doc_header += "## VIDEO DESCRIPTION\n"
+        doc_header += (description if description else "No description available") + "\n\n"
+        doc_header += "## LINKS\n"
+        if links:
+            doc_header += "\n".join(f"- {link}" for link in links) + "\n\n"
+        else:
+            doc_header += "No links found\n\n"
+            
+        structured_edit = frontmatter + doc_header + ai_result
     else:
         # Parse "all" response - look for sections
         current_section = "summary"
@@ -583,4 +630,5 @@ async def analyze(request: Request, analyze_req: AnalyzeRequest) -> AnalyzeRespo
         summary=summary,
         action_points=action_points,
         next_steps=next_steps,
+        structured_edit=structured_edit,
     )
