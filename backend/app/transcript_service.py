@@ -1,4 +1,6 @@
-"""
+from __future__ import annotations
+
+__doc__ = """
 Transcript service for fetching YouTube video transcripts.
 
 Handles:
@@ -8,11 +10,12 @@ Handles:
 - YouTube Data API integration for video metadata
 """
 
-from __future__ import annotations
-
 import os
 import re
 from collections import Counter
+from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
+from typing import Any
 from urllib.parse import parse_qs, quote, urlparse
 
 from youtube_transcript_api import YouTubeTranscriptApi
@@ -26,7 +29,28 @@ from youtube_transcript_api._errors import (
 from youtube_transcript_api.proxies import GenericProxyConfig
 
 from .logging_config import get_logger, mask_proxy_url
-from .models import TranscriptSegment, validate_video_id_format
+
+try:  # FastAPI transport provides Pydantic models; fallback keeps core pure
+    from .models import TranscriptSegment, validate_video_id_format
+except (ImportError, ModuleNotFoundError):
+    _VIDEO_ID_PATTERN = re.compile(r"^[a-zA-Z0-9_-]{11}$")
+
+    @dataclass(slots=True)
+    class TranscriptSegment:  # type: ignore[override]
+        start: float
+        duration: float
+        text: str
+
+    def validate_video_id_format(video_id: str) -> str:  # pragma: no cover - mirrored logic
+        if not video_id:
+            raise ValueError("Video ID cannot be empty")
+        if len(video_id) != 11:
+            raise ValueError(f"Video ID must be exactly 11 characters, got {len(video_id)}")
+        if not _VIDEO_ID_PATTERN.match(video_id):
+            raise ValueError(
+                "Video ID must contain only alphanumeric characters, underscores, or hyphens"
+            )
+        return video_id
 
 logger = get_logger("transcript_service")
 
@@ -119,6 +143,27 @@ def mask_proxy_url_for_logs(url: str) -> str:
 
 class TranscriptError(RuntimeError):
     pass
+
+
+def _coerce_segment_text(segment: Any) -> str:
+    """Safely extract text from TranscriptSegment-like objects or mappings."""
+    if isinstance(segment, Mapping):
+        value = segment.get("text", "")
+    else:
+        value = getattr(segment, "text", "")
+    return str(value or "").strip()
+
+
+def _coerce_segment_start(segment: Any) -> float:
+    """Best-effort extraction of segment start time."""
+    if isinstance(segment, Mapping):
+        value = segment.get("start", 0.0)
+    else:
+        value = getattr(segment, "start", 0.0)
+    try:
+        return float(value)
+    except (TypeError, ValueError):  # pragma: no cover - defensive fallback
+        return 0.0
 
 
 # =============================================================================
@@ -379,18 +424,43 @@ def format_seconds(seconds: float) -> str:
     return f"{m:02}:{s:02}"
 
 
-def to_plain_text(segments: list[TranscriptSegment], include_timestamps: bool = False) -> str:
-    """Convert transcript to plain text.
-    
-    Args:
-        segments: List of transcript segments
-        include_timestamps: If True, include timestamps in format [00:00]; if False, return clean text
-    """
-    if include_timestamps:
-        return "\n".join(f"[{format_seconds(seg.start)}] {seg.text}" for seg in segments)
-    else:
-        # Clean text without timestamps
-        return "\n".join(seg.text for seg in segments)
+def to_plain_text(
+    segments: Sequence[TranscriptSegment],
+    include_timestamps: bool = False,
+) -> str:
+    """Convert transcript to plain text, optionally including timestamps."""
+    lines: list[str] = []
+
+    for segment in segments:
+        text = _coerce_segment_text(segment)
+        if not text:
+            continue
+
+        if include_timestamps:
+            lines.append(f"[{format_seconds(_coerce_segment_start(segment))}] {text}")
+        else:
+            lines.append(text)
+
+    return "\n".join(lines)
+
+
+def summarize_segments(
+    segments: Sequence[TranscriptSegment],
+    limit: int = 5,
+) -> str:
+    """Simple extractive summary helper for transport layers."""
+    if limit <= 0:
+        raise ValueError("Summary limit must be a positive integer")
+
+    collected: list[str] = []
+    for segment in segments:
+        text = _coerce_segment_text(segment)
+        if text:
+            collected.append(text)
+        if len(collected) >= limit:
+            break
+
+    return " ".join(collected)
 
 
 def _top_keywords(segments: list[TranscriptSegment]) -> list[str]:
