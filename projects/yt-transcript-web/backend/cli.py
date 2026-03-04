@@ -10,6 +10,7 @@ from typing import Optional
 
 import click
 
+from app import __version__
 from app.transcript_service import (
     TranscriptError,
     fetch_transcript,
@@ -19,7 +20,7 @@ from app.transcript_service import (
 
 
 @click.group()
-@click.version_option(version="1.0.0", prog_name="yt-transcript-cli")
+@click.version_option(version=__version__, prog_name="yt-transcript-cli")
 def cli() -> None:
     """YT-Transcript CLI — Extract and summarize YouTube transcripts."""
     pass
