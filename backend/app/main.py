@@ -46,6 +46,7 @@ from .transcript_service import (
     extract_links,
     fetch_transcript,
     fetch_video_info,
+    summarize_segments,
     to_markdown,
     to_plain_text,
 )
@@ -258,9 +259,7 @@ def summarize(request: Request, extract_req: ExtractRequest) -> dict:
 
     video_id, transcript = _fetch_transcript_or_raise(str(extract_req.url), request)
 
-    # Simple extractive summary - first 5 segments
-    summary_parts = [seg.text for seg in transcript[:5]]
-    summary = " ".join(summary_parts)
+    summary = summarize_segments(transcript, limit=5)
 
     return {"video_id": video_id, "summary": summary}
 
