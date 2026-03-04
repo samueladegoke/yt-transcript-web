@@ -39,13 +39,21 @@ def cli() -> None:
     default=True,
     help="Include timestamps in plain text output. (default: enabled)",
 )
-def extract(url: str, fmt: str, timestamps: bool) -> None:
+@click.option(
+    "--language",
+    "-l",
+    "languages",
+    multiple=True,
+    help="Preferred language codes (e.g., en, de). Can be repeated.",
+)
+def extract(url: str, fmt: str, timestamps: bool, languages: tuple[str, ...]) -> None:
     """Extract transcript from a YouTube video URL.
 
     URL must be a valid YouTube video URL (watch, shorts, embed, or youtu.be).
     """
+    lang_list = list(languages) if languages else None
     try:
-        video_id, segments = fetch_transcript(url)
+        video_id, segments = fetch_transcript(url, languages=lang_list)
     except TranscriptError as e:
         click.echo(f"Error: {e}", err=True)
         sys.exit(1)
@@ -87,13 +95,25 @@ def extract(url: str, fmt: str, timestamps: bool) -> None:
     default=5,
     help="Number of summary sentences to generate. (default: 5)",
 )
-def summary(url: str, fmt: str, limit: int) -> None:
+@click.option(
+    "--language",
+    "-l",
+    "languages",
+    multiple=True,
+    help="Preferred language codes (e.g., en, de). Can be repeated.",
+)
+def summary(url: str, fmt: str, limit: int, languages: tuple[str, ...]) -> None:
     """Summarize a YouTube video transcript.
 
     URL must be a valid YouTube video URL. Outputs a summary of the content.
     """
+    if limit <= 0:
+        click.echo("Error: --limit must be a positive integer.", err=True)
+        sys.exit(1)
+
+    lang_list = list(languages) if languages else None
     try:
-        video_id, segments = fetch_transcript(url)
+        video_id, segments = fetch_transcript(url, languages=lang_list)
     except TranscriptError as e:
         click.echo(f"Error: {e}", err=True)
         sys.exit(1)

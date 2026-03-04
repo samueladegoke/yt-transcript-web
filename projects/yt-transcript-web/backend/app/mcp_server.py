@@ -37,12 +37,16 @@ async def mcp_extract_transcript(url: str, languages: list[str] | None = None) -
     )
 
 
-async def mcp_get_summary(url: str) -> dict:
+async def mcp_get_summary(url: str, limit: int = 5) -> dict:
     """MCP tool: Get extractive summary from a YouTube transcript."""
     try:
         video_id, segments = fetch_transcript(url)
     except TranscriptError as exc:
         raise ValueError(str(exc)) from exc
 
-    summary = " ".join(seg.text for seg in segments[:5])
-    return {"video_id": video_id, "summary": summary}
+    if not segments:
+        return {"video_id": video_id, "summary": "", "segments_used": 0}
+
+    summary_segments = segments[:limit]
+    summary = " ".join(seg.text for seg in summary_segments)
+    return {"video_id": video_id, "summary": summary, "segments_used": len(summary_segments)}

@@ -78,6 +78,23 @@ class TestMCPSummaryTool:
         )
         assert "summary" in result
         assert "video_id" in result
+        assert "segments_used" in result
+
+    @pytest.mark.asyncio
+    async def test_summary_with_limit(self, mock_yt_api):
+        result = await mcp_get_summary(
+            url="https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            limit=2
+        )
+        assert result["segments_used"] == 2
+
+    @pytest.mark.asyncio
+    async def test_summary_empty_segments(self, mock_yt_api):
+        mock_yt_api.return_value = mock_yt_api._make_mock_fetched([])
+        with pytest.raises(ValueError, match="No transcript text found"):
+            await mcp_get_summary(
+                url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+            )
 
     @pytest.mark.asyncio
     async def test_invalid_url_raises(self):

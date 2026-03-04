@@ -90,6 +90,24 @@ class TestCLISummary:
         data = json.loads(result.output)
         assert data["segments_used"] == 2
 
+    def test_summary_invalid_limit(self):
+        """Summary with negative limit should exit with error."""
+        runner = CliRunner()
+        result = runner.invoke(cli, ["summary", "https://www.youtube.com/watch?v=dQw4w9WgXcQ", "--limit", "-1"])
+        assert result.exit_code == 1
+        assert "Error:" in result.output
+
+    def test_extract_with_language(self, mock_yt_api):
+        """Extract with --language should pass language list to API."""
+        runner = CliRunner()
+        result = runner.invoke(cli, ["extract", "https://www.youtube.com/watch?v=dQw4w9WgXcQ", "--language", "en", "--language", "de"])
+        assert result.exit_code == 0
+        # Verify fetch_transcript was called with languages=['en', 'de']
+        # mock_yt_api is YouTubeTranscriptApi.fetch
+        mock_yt_api.assert_called()
+        args, kwargs = mock_yt_api.call_args
+        assert list(kwargs["languages"]) == ["en", "de"]
+
 
 class TestCLIHelp:
     """Tests for CLI help and version."""
