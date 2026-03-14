@@ -40,14 +40,21 @@ export default function Hero() {
 
       {/* Content */}
       <div className="relative z-10">
+        {/* Watermark Logo — large, ultra-subtle background shield */}
+        <img
+          src="/assets/brand/E.T.D_logo_f4_transparent.png"
+          alt=""
+          className="pointer-events-none select-none absolute right-8 lg:right-16 top-1/2 -translate-y-1/2 w-[300px] h-auto opacity-[0.025] hidden md:block"
+        />
+
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2, duration: 0.5 }}
-          className="inline-flex items-center gap-3 rounded-full border border-[#00D4FF]/50 bg-[#00D4FF]/10 px-4 py-2 mb-6"
+          className="inline-flex items-center gap-4 rounded-2xl border border-[#00D4FF]/40 bg-[#0A1832]/80 backdrop-blur-sm px-5 py-3 mb-6"
         >
-          <img src="/assets/brand/E.T.D_logo_f4_transparent.png" alt="E.T.D" className="h-8 w-auto" />
-          <span className="text-xs font-medium text-[#7AE8FF]">Elohim Tech Dynamics</span>
+          <img src="/assets/brand/E.T.D_logo_f4_transparent.png" alt="E.T.D" className="h-14 w-auto" />
+          <span className="text-sm font-semibold tracking-wide text-[#7AE8FF]">Elohim Tech Dynamics</span>
         </motion.div>
 
         <motion.h1

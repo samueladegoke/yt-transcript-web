@@ -89,6 +89,24 @@
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
   }
+
+  /* ─── E.T.D Watermark — subtle body-level logo ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 50%;
+    right: -80px;
+    transform: translateY(-50%);
+    width: 480px;
+    height: 480px;
+    background-image: url('/assets/brand/E.T.D_logo_f4_transparent.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.025;
+    pointer-events: none;
+    z-index: 0;
+  }
 }
 
 @layer utilities {
