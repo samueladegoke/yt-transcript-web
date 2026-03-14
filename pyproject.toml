@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "yt-transcript-mcp"
-version = "0.1.0"
+version = "0.2.0"
 description = "YouTube Transcript MCP Server and CLI"
 readme = "README.md"
 license = "MIT"
@@ -31,3 +31,7 @@ classifiers = [
 yt-transcript = "backend.app.cli:main"
 yt-transcript-mcp = "backend.app.mcp_server:main"
 yt-transcript-proxy = "backend.app.mcp_proxy:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["backend.app*"]

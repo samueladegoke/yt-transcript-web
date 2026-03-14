@@ -1,0 +1,26 @@
+
+> frontend@0.0.0 lint
+> eslint .
+
+
+C:\Users\USER\Music\Obsidian-Vault\01_Projects\Proxy_Check\frontend\src\App.jsx
+   43:20  error  '_e' is defined but never used                                                                         no-unused-vars
+   55:16  error  '_error' is defined but never used                                                                     no-unused-vars
+  114:10  error  'lastUpdate' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u             no-unused-vars
+  124:26  error  'setShowProxyInput' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u      no-unused-vars
+  144:10  error  'ipChanges' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u              no-unused-vars
+  215:14  error  '_err' is defined but never used                                                                       no-unused-vars
+  221:9   error  'stats' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                  no-unused-vars
+  248:9   error  'sessionProxyMap' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u        no-unused-vars
+  320:9   error  'handleProxyInputPaste' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  333:9   error  'clearProxyInput' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u        no-unused-vars
+  447:9   error  'startTracking' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u          no-unused-vars
+  497:9   error  'stopTracking' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u           no-unused-vars
+  511:9   error  'clearError' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u             no-unused-vars
+  664:59  error  'len' is not defined                                                                                   no-undef
+
+C:\Users\USER\Music\Obsidian-Vault\01_Projects\Proxy_Check\frontend\src\App_backup.jsx
+  851:1  error  Parsing error: Unexpected token `}`. Did you mean `&rbrace;` or `{"}"}`?
+
+Γ£û 15 problems (15 errors, 0 warnings)
+

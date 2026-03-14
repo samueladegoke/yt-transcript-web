@@ -1,3 +1,4 @@
+# Python
 venv/
 __pycache__/
 *.egg-info/
@@ -5,3 +6,11 @@ dist/
 build/
 *.pyc
 .env
+
+# Frontend
+node_modules/
+*.log
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store

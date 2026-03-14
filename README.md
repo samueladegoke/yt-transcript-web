@@ -1,177 +1,129 @@
-# YouTube Transcript MCP Server and CLI
+# YouTube Transcript Web
 
-A Python package for fetching and analyzing YouTube video transcripts via MCP (Model Context Protocol) and CLI.
+A full-stack YouTube transcript extraction platform with:
 
-## Features
+- **Web UI** — React + Vite frontend deployed on Cloudflare Pages
+- **API Backend** — FastAPI server deployed on Render
+- **MCP Integration** — Model Context Protocol server for AI assistants (Claude, Cursor, VS Code, etc.)
 
-- **Fetch Transcripts**: Get full transcripts from YouTube videos
-- **Video Info**: Retrieve basic video information
-- **Analysis**: Generate summaries, outlines, and key points
-- **Multiple Formats**: Output as text, JSON, or SRT subtitles
-- **MCP Server**: Integration with AI assistants via MCP protocol
+## Quick Start
 
-## Two Installation Modes
+### Web UI
+Visit the live app: **https://yt-transcript-web.pages.dev**
 
-### 🚀 Proxy Mode (Recommended — Zero Config)
-Connects to Sam's hosted backend. No local dependencies beyond Python.
+Paste any YouTube URL to extract and download transcripts as TXT or Markdown.
 
-```bash
-# Install and run via uvx (no install needed)
-uvx yt-transcript-proxy
-
-# Or install globally
-pip install yt-transcript-mcp
-yt-transcript-proxy
-```
-
-### 🔧 Full Local Mode
-Runs the complete server locally. Requires `youtube-transcript-api` and network access to YouTube.
+### MCP Integration
+Connect to your AI assistant in one command:
 
 ```bash
-yt-transcript-mcp
+uvx --from "git+https://github.com/samueladegoke/yt-transcript.git#subdirectory=backend" yt-transcript-proxy
 ```
 
-**Note:** Local mode requires a working YouTube transcript backend. Configure via `RENDER_BACKEND_URL` env var if using a custom backend.
-
-## Installation
-
-### Quick Start (uvx — No Install)
-
-```bash
-# Proxy mode (recommended)
-uvx yt-transcript-proxy
-
-# Full local server
-uvx yt-transcript-mcp
-```
-
-### From Source
-
-```bash
-# Clone the repository
-git clone <repository-url>
-cd yt-transcript-web
-
-# Install in development mode
-pip install -e .
-```
-
-### From PyPI
-
-```bash
-pip install yt-transcript-mcp
-```
-
-## CLI Usage
-
-### Get Transcript
-
-```bash
-# Get transcript as text
-yt-transcript transcript <url>
-
-# Get transcript as JSON
-yt-transcript transcript <url> --format json
-
-# Get transcript as SRT subtitles
-yt-transcript transcript <url> --format srt
-
-# Save to file
-yt-transcript transcript <url> --output transcript.txt
-
-# Specify language
-yt-transcript transcript <url> --lang es
-```
-
-### Get Video Info
-
-```bash
-# Get video information
-yt-transcript info <url>
-
-# Get info as JSON
-yt-transcript info <url> --format json
-```
-
-### Analyze Video
-
-```bash
-# Get summary
-yt-transcript analyze <url>
-
-# Get outline
-yt-transcript analyze <url> --type outline
-
-# Get key points
-yt-transcript analyze <url> --type key_points
-
-# Analyze and save
-yt-transcript analyze <url> --output analysis.json --format json
-```
-
-### Health Check
-
-```bash
-# Check environment configuration
-yt-transcript health
-```
-
-## MCP Server Usage
-
-Start the MCP server:
-
-```bash
-yt-transcript-mcp
-```
-
-Configure in your AI assistant's MCP settings:
+Add to your AI tool's MCP config:
 
 ```json
 {
   "mcpServers": {
     "youtube-transcript": {
-      "command": "yt-transcript-mcp",
-      "env": {
-        "YOUTUBE_API_KEY": "your-api-key"
-      }
+      "command": "uvx",
+      "args": ["--from", "git+https://github.com/samueladegoke/yt-transcript.git#subdirectory=backend", "yt-transcript-proxy"]
     }
   }
 }
 ```
 
-## Configuration
+Supported: Claude Desktop, Cursor, VS Code Copilot, Windsurf, Cline, OpenClaw, and any MCP-compatible host.
 
-Set the following environment variables:
-
-- `YOUTUBE_API_KEY`: YouTube Data API key (optional, for enhanced features)
-
-## Development
-
-### Running Tests
-
-```bash
-pip install pytest pytest-asyncio
-pytest tests/ -v
-```
-
-### Project Structure
+## Project Structure
 
 ```
 yt-transcript-web/
-├── backend/
+├── frontend/              # React + Vite web app
+│   ├── src/
+│   │   ├── components/    # UI components
+│   │   │   ├── MCPIntegration.jsx
+│   │   │   ├── MCPPlatformCard.jsx
+│   │   │   ├── MCPCopyBlock.jsx
+│   │   │   └── TabNavigation.jsx
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   ├── package.json
+│   ├── vite.config.js
+│   └── wrangler.toml      # Cloudflare Pages config
+├── backend/               # Python backend
 │   ├── app/
-│   │   ├── __init__.py
-│   │   ├── cli.py           # CLI implementation
-│   │   ├── mcp_server.py    # MCP server
-│   │   └── transcript_service.py  # Core service
-├── tests/
-│   ├── __init__.py
-│   └── test_cli.py          # CLI tests
-├── pyproject.toml
-├── setup.py
+│   │   ├── mcp_server.py  # MCP server
+│   │   ├── mcp_proxy.py   # MCP proxy (CLI entrypoint)
+│   │   └── transcript_service.py  # Core transcript logic
+│   ├── main.py            # FastAPI application
+│   ├── requirements.txt
+│   ├── Dockerfile
+│   └── render.yaml        # Render deployment config
+├── pyproject.toml         # Python package config
 └── README.md
 ```
 
+## API Endpoints
+
+The FastAPI backend exposes:
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/` | GET | Service status |
+| `/health` | GET | Health check |
+| `/transcript` | POST | Extract transcript (`{url, lang}`) |
+| `/video-info` | POST | Get video metadata (`{url}`) |
+| `/analyze` | POST | Analyze transcript (`{url, type}`) |
+
+### Example
+
+```bash
+curl -X POST https://yt-transcript-api.onrender.com/transcript \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ", "lang": "en"}'
+```
+
+## Development
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev        # http://localhost:5173
+npm run build      # Production build
+```
+
+### Backend
+
+```bash
+cd backend
+pip install -r requirements.txt
+uvicorn main:app --reload --port 8000
+```
+
+### MCP Server (standalone)
+
+```bash
+pip install -e .
+yt-transcript-proxy      # stdio mode for MCP hosts
+yt-transcript --url "https://..."  # CLI mode
+```
+
+## Deployment
+
+- **Frontend**: Cloudflare Pages (auto-deploys from `main` branch)
+- **Backend**: Render (configured via `backend/render.yaml`)
+- **MCP Server**: PyPI package (`yt-transcript-mcp`)
+
+## Contributing
+
+1. Fork the repo
+2. Create a feature branch: `git checkout -b feat/my-feature`
+3. Commit: `git commit -m "feat: add my feature"`
+4. Push and open a PR
+
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE).
