@@ -16,8 +16,8 @@ export default function MCPCopyBlock({ title, config, language = 'json' }) {
     if (language !== 'json') return text;
     
     return text
-      .replace(/"([^"]+)":/g, '<span class="text-[#8fb3ff]">"$1"</span>:')
-      .replace(/: "([^"]+)"/g, ': <span class="text-[#00E676]">"$1"</span>')
+      .replace(/"([^"]+)":/g, '<span class="text-[#7AE8FF]">"$1"</span>:')
+      .replace(/: "([^"]+)"/g, ': <span class="text-[#C8A941]">"$1"</span>')
       .replace(/: (\d+)/g, ': <span class="text-[#ffb86c]">$1</span>')
       .replace(/\b(true|false|null)\b/g, '<span class="text-[#ff79c6]">$1</span>');
   };
@@ -28,7 +28,7 @@ export default function MCPCopyBlock({ title, config, language = 'json' }) {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-xl border border-slate-700 bg-[#111820] overflow-hidden"
+      className="rounded-xl border border-slate-700 bg-[#122240] overflow-hidden"
     >
       <div className="flex items-center justify-between border-b border-slate-800 px-4 py-2.5">
         <span className="text-xs font-medium text-slate-400">{title}</span>
@@ -36,7 +36,7 @@ export default function MCPCopyBlock({ title, config, language = 'json' }) {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={handleCopy}
-          className="flex items-center gap-1.5 rounded-md px-2 py-1 text-xs text-slate-400 hover:text-[#00E676] hover:bg-[#00E676]/10 transition-all"
+          className="flex items-center gap-1.5 rounded-md px-2 py-1 text-xs text-slate-400 hover:text-[#C8A941] hover:bg-[#C8A941]/10 transition-all"
         >
           <AnimatePresence mode="wait">
             {copied ? (

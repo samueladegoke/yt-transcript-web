@@ -7,6 +7,7 @@ export default {
     theme: {
         extend: {
             colors: {
+                /* ─── Semantic tokens (from CSS vars) ─── */
                 background: "hsl(var(--background))",
                 foreground: "hsl(var(--foreground))",
                 card: "hsl(var(--card))",
@@ -27,6 +28,27 @@ export default {
                 border: "hsl(var(--border))",
                 input: "hsl(var(--input))",
                 ring: "hsl(var(--ring))",
+
+                /* ─── E.T.D Brand Colors ─── */
+                "etd-navy": {
+                    DEFAULT: "#0A1832",
+                    mid: "#122240",
+                    text: "#15263D",
+                },
+                "etd-gold": {
+                    DEFAULT: "#C8A941",
+                    highlight: "#E8C85A",
+                    shadow: "#8B7229",
+                    deep: "#6B5A22",
+                    text: "#A08040",
+                },
+                "etd-cyan": {
+                    DEFAULT: "#00D4FF",
+                    bright: "#7AE8FF",
+                    shadow: "#0099BB",
+                },
+                "etd-white": "#FFFFFF",
+                "etd-halo": "#CCE8FF",
             },
             borderRadius: {
                 lg: "var(--radius)",

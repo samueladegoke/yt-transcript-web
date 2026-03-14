@@ -127,7 +127,7 @@ function App() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="min-h-screen bg-[#121212] text-slate-100"
+      className="min-h-screen bg-[#0A1832] text-slate-100"
     >
       <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
         <Hero />
@@ -140,7 +140,7 @@ function App() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.5 }}
-                className="rounded-2xl border border-slate-800 bg-gradient-to-br from-[#161616] via-[#121212] to-[#14192b] p-6 shadow-[0_0_0_1px_rgba(0,230,118,0.06)] sm:p-10"
+                className="rounded-2xl border border-slate-800 bg-gradient-to-br from-[#122240] via-[#0A1832] to-[#14192b] p-6 shadow-[0_0_0_1px_rgba(0,230,118,0.06)] sm:p-10"
               >
                 <form className="space-y-6" onSubmit={handleExtract}>
                   {/* URL Input */}
@@ -149,8 +149,8 @@ function App() {
                       YouTube URL
                     </label>
                     <div className="group relative">
-                      <div className="flex items-center gap-3 rounded-xl border border-slate-700 bg-[#111820] px-4 py-3 transition-all focus-within:border-[#00E676] focus-within:ring-2 focus-within:ring-[#00E676]/20">
-                        <Link2 className="h-5 w-5 text-[#2962FF] group-focus-within:text-[#00E676] transition-colors" />
+                      <div className="flex items-center gap-3 rounded-xl border border-slate-700 bg-[#122240] px-4 py-3 transition-all focus-within:border-[#C8A941] focus-within:ring-2 focus-within:ring-[#C8A941]/20">
+                        <Link2 className="h-5 w-5 text-[#00D4FF] group-focus-within:text-[#C8A941] transition-colors" />
                         <input
                           className="w-full bg-transparent text-base text-slate-100 outline-none placeholder:text-slate-500"
                           placeholder="https://www.youtube.com/watch?v=..."
@@ -166,7 +166,7 @@ function App() {
                     <label className="flex items-center gap-3 text-sm text-slate-300">
                       <span className="text-slate-400">Language</span>
                       <input
-                        className="w-20 rounded-lg border border-slate-700 bg-[#111820] px-3 py-2 text-sm lowercase text-slate-100 outline-none focus:border-[#2962FF] transition-colors"
+                        className="w-20 rounded-lg border border-slate-700 bg-[#122240] px-3 py-2 text-sm lowercase text-slate-100 outline-none focus:border-[#00D4FF] transition-colors"
                         value={language}
                         onChange={(event) => setLanguage(event.target.value)}
                         maxLength={10}
@@ -178,7 +178,7 @@ function App() {
                       disabled={loading}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#00E676] to-[#00d36b] px-6 py-3 text-sm font-semibold text-[#04160c] transition-all hover:shadow-lg hover:shadow-[#00E676]/20 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:shadow-none"
+                      className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#C8A941] to-[#C8A941] px-6 py-3 text-sm font-semibold text-[#0A1832] transition-all hover:shadow-lg hover:shadow-[#C8A941]/20 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:shadow-none"
                     >
                       {loading ? (
                         <Loader2 className="h-5 w-5 animate-spin" />
@@ -197,7 +197,7 @@ function App() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5 }}
-                  className="mt-8 rounded-2xl border border-slate-800 bg-[#141414] p-6 shadow-[0_0_0_1px_rgba(41,98,255,0.12)]"
+                  className="mt-8 rounded-2xl border border-slate-800 bg-[#122240] p-6 shadow-[0_0_0_1px_rgba(41,98,255,0.12)]"
                 >
                   <div className="flex flex-col gap-4 border-b border-slate-800 pb-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
@@ -213,9 +213,9 @@ function App() {
                         onClick={handleDownloadTxt}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className="inline-flex items-center gap-2 rounded-lg border border-slate-700 bg-[#181818] px-4 py-2 text-sm text-slate-200 hover:border-[#00E676]/70 hover:bg-[#181818]/80 transition-all"
+                        className="inline-flex items-center gap-2 rounded-lg border border-slate-700 bg-[#122240] px-4 py-2 text-sm text-slate-200 hover:border-[#C8A941]/70 hover:bg-[#122240]/80 transition-all"
                       >
-                        <Download className="h-4 w-4 text-[#00E676]" />
+                        <Download className="h-4 w-4 text-[#C8A941]" />
                         TXT
                       </motion.button>
                       <motion.button
@@ -223,7 +223,7 @@ function App() {
                         onClick={handleDownloadMd}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className="inline-flex items-center gap-2 rounded-lg border border-[#2962FF]/60 bg-[#1a2140] px-4 py-2 text-sm text-[#d6e3ff] hover:bg-[#202a50] transition-all"
+                        className="inline-flex items-center gap-2 rounded-lg border border-[#00D4FF]/60 bg-[#122240] px-4 py-2 text-sm text-[#CCE8FF] hover:bg-[#15263D] transition-all"
                       >
                         <Download className="h-4 w-4" />
                         MD

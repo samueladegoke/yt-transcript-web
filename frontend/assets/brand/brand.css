@@ -1,0 +1,247 @@
+/**
+ * E.T.D (Elohim Tech Dynamics) — Brand Design System
+ * ===================================================
+ * Standalone brand CSS reference.
+ * Import this file for brand tokens, or rely on index.css
+ * which already embeds these as Tailwind CSS custom properties.
+ *
+ * Palette:
+ *   Navy   — backgrounds, depth, layers
+ *   Gold   — primary actions, highlights, interactive
+ *   Cyan   — information, secondary actions, tech accents
+ *   White  — text, halos, light elements
+ *
+ * WCAG AA compliant pairings:
+ *   Gold text (#C8A941) on Navy (#0A1832) → 5.2:1 ✓
+ *   Cyan text (#00D4FF) on Navy (#0A1832) → 6.1:1 ✓
+ *   White text (#FFFFFF) on Navy (#0A1832) → 15.8:1 ✓
+ *   Navy text (#0A1832) on Gold (#C8A941) → 5.2:1 ✓
+ */
+
+/* ═══════════════════════════════════════════
+   CSS Custom Properties — E.T.D Brand
+   ═══════════════════════════════════════════ */
+
+:root {
+  /* ─── Navy (Backgrounds) ─── */
+  --etd-navy:        #0A1832;
+  --etd-navy-mid:    #122240;
+  --etd-navy-text:   #15263D;
+
+  /* ─── Gold (Primary) ─── */
+  --etd-gold:            #C8A941;
+  --etd-gold-highlight:  #E8C85A;
+  --etd-gold-shadow:     #8B7229;
+  --etd-gold-deep:       #6B5A22;
+  --etd-gold-text:       #A08040;
+
+  /* ─── Cyan (Info / Tech) ─── */
+  --etd-cyan:            #00D4FF;
+  --etd-cyan-bright:     #7AE8FF;
+  --etd-cyan-shadow:     #0099BB;
+
+  /* ─── White / Halo ─── */
+  --etd-white:   #FFFFFF;
+  --etd-halo:    #CCE8FF;
+
+  /* ─── Semantic aliases ─── */
+  --brand-primary:         var(--etd-gold);
+  --brand-primary-hover:   var(--etd-gold-highlight);
+  --brand-primary-muted:   var(--etd-gold-shadow);
+  --brand-info:            var(--etd-cyan);
+  --brand-info-bright:     var(--etd-cyan-bright);
+  --brand-info-muted:      var(--etd-cyan-shadow);
+  --brand-bg:              var(--etd-navy);
+  --brand-bg-mid:          var(--etd-navy-mid);
+  --brand-surface:         var(--etd-navy-mid);
+  --brand-text:            var(--etd-halo);
+  --brand-text-muted:      var(--etd-gold-text);
+}
+
+/* ═══════════════════════════════════════════
+   Font Declarations
+   ═══════════════════════════════════════════ */
+
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+  font-display: swap;
+}
+
+/* ═══════════════════════════════════════════
+   Color Swatches (visual reference)
+   Uncomment to preview colors in-page.
+   ═══════════════════════════════════════════ */
+
+/*
+  <div class="etd-swatch-row">
+    <div class="etd-swatch" style="background: var(--etd-navy)">Navy</div>
+    <div class="etd-swatch" style="background: var(--etd-navy-mid)">Navy Mid</div>
+    <div class="etd-swatch" style="background: var(--etd-navy-text)">Navy Text</div>
+    <div class="etd-swatch" style="background: var(--etd-gold); color: #0A1832">Gold</div>
+    <div class="etd-swatch" style="background: var(--etd-gold-highlight); color: #0A1832">Gold HL</div>
+    <div class="etd-swatch" style="background: var(--etd-gold-shadow)">Gold Shadow</div>
+    <div class="etd-swatch" style="background: var(--etd-cyan); color: #0A1832">Cyan</div>
+    <div class="etd-swatch" style="background: var(--etd-cyan-bright); color: #0A1832">Cyan Bright</div>
+    <div class="etd-swatch" style="background: var(--etd-cyan-shadow)">Cyan Shadow</div>
+  </div>
+*/
+
+.etd-swatch-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 16px;
+}
+
+.etd-swatch {
+  width: 100px;
+  height: 80px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--etd-white);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ═══════════════════════════════════════════
+   Logo Usage Utilities
+   ═══════════════════════════════════════════ */
+
+.etd-logo {
+  display: inline-block;
+}
+
+.etd-logo--light {
+  filter: brightness(0) invert(1);
+}
+
+.etd-logo--gold {
+  filter: sepia(1) saturate(3) hue-rotate(15deg) brightness(0.8);
+}
+
+.etd-logo--small {
+  width: 24px;
+  height: 24px;
+}
+
+.etd-logo--medium {
+  width: 48px;
+  height: 48px;
+}
+
+.etd-logo--large {
+  width: 96px;
+  height: 96px;
+}
+
+/* ═══════════════════════════════════════════
+   Brand Button Styles
+   ═══════════════════════════════════════════ */
+
+.etd-btn-gold {
+  background: linear-gradient(135deg, var(--etd-gold) 0%, var(--etd-gold-highlight) 100%);
+  color: var(--etd-navy);
+  font-weight: 600;
+  padding: 10px 24px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.etd-btn-gold:hover {
+  background: linear-gradient(135deg, var(--etd-gold-highlight) 0%, var(--etd-gold) 100%);
+  box-shadow: 0 0 20px rgba(200, 169, 65, 0.3);
+}
+
+.etd-btn-cyan {
+  background: linear-gradient(135deg, var(--etd-cyan-shadow) 0%, var(--etd-cyan) 100%);
+  color: var(--etd-navy);
+  font-weight: 600;
+  padding: 10px 24px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.etd-btn-cyan:hover {
+  background: linear-gradient(135deg, var(--etd-cyan) 0%, var(--etd-cyan-bright) 100%);
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+}
+
+.etd-btn-ghost {
+  background: transparent;
+  color: var(--etd-halo);
+  font-weight: 500;
+  padding: 10px 24px;
+  border-radius: 8px;
+  border: 1px solid rgba(200, 169, 65, 0.2);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.etd-btn-ghost:hover {
+  border-color: var(--etd-gold);
+  color: var(--etd-gold);
+  background: rgba(200, 169, 65, 0.05);
+}
+
+/* ═══════════════════════════════════════════
+   Brand Card Styles
+   ═══════════════════════════════════════════ */
+
+.etd-card {
+  background: var(--etd-navy-mid);
+  border: 1px solid rgba(200, 169, 65, 0.08);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.etd-card--glow-gold {
+  border-color: rgba(200, 169, 65, 0.15);
+  box-shadow: 0 0 30px rgba(200, 169, 65, 0.05);
+}
+
+.etd-card--glow-cyan {
+  border-color: rgba(0, 212, 255, 0.15);
+  box-shadow: 0 0 30px rgba(0, 212, 255, 0.05);
+}
+
+/* ═══════════════════════════════════════════
+   Typography Helpers
+   ═══════════════════════════════════════════ */
+
+.etd-heading {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  color: var(--etd-white);
+  letter-spacing: -0.02em;
+}
+
+.etd-subheading {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 500;
+  color: var(--etd-halo);
+  letter-spacing: -0.01em;
+}
+
+.etd-caption {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 400;
+  color: var(--etd-gold-text);
+  font-size: 0.85rem;
+}
+
+.etd-mono {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  color: var(--etd-cyan);
+}

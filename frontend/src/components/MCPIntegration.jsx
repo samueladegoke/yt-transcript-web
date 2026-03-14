@@ -27,9 +27,9 @@ const platforms = [
 ];
 
 const features = [
-  { icon: Terminal, text: 'Get full transcripts from any YouTube video', color: 'text-[#00E676]' },
+  { icon: Terminal, text: 'Get full transcripts from any YouTube video', color: 'text-[#C8A941]' },
   { icon: Zap, text: 'Fetch video metadata (title, channel, views)', color: 'text-[#ffb86c]' },
-  { icon: BookOpen, text: 'Analyze: summaries, outlines, key points', color: 'text-[#8fb3ff]' },
+  { icon: BookOpen, text: 'Analyze: summaries, outlines, key points', color: 'text-[#7AE8FF]' },
   { icon: Plug, text: 'Zero-config proxy mode — no API keys needed', color: 'text-purple-400' },
 ];
 
@@ -41,13 +41,13 @@ export default function MCPIntegration() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="relative overflow-hidden rounded-2xl border border-slate-800 bg-gradient-to-br from-[#161616] via-[#121212] to-[#14192b] p-6 sm:p-8"
+        className="relative overflow-hidden rounded-2xl border border-slate-800 bg-gradient-to-br from-[#122240] via-[#0A1832] to-[#14192b] p-6 sm:p-8"
       >
         {/* Animated background glow */}
         <motion.div
           animate={{ scale: [1, 1.1, 1], opacity: [0.08, 0.12, 0.08] }}
           transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute top-0 right-0 w-1/2 h-full bg-[#2962FF]/10 rounded-full blur-3xl"
+          className="absolute top-0 right-0 w-1/2 h-full bg-[#00D4FF]/10 rounded-full blur-3xl"
         />
 
         <div className="relative z-10">
@@ -55,9 +55,9 @@ export default function MCPIntegration() {
             <motion.div
               animate={{ rotate: [0, 5, -5, 0] }}
               transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-              className="flex h-14 w-14 items-center justify-center rounded-xl bg-[#2962FF]/10 border border-[#2962FF]/20"
+              className="flex h-14 w-14 items-center justify-center rounded-xl bg-[#00D4FF]/10 border border-[#00D4FF]/20"
             >
-              <Plug className="h-7 w-7 text-[#8fb3ff]" />
+              <Plug className="h-7 w-7 text-[#7AE8FF]" />
             </motion.div>
             <div>
               <motion.h2
@@ -103,7 +103,7 @@ export default function MCPIntegration() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 + idx * 0.1 }}
                 whileHover={{ y: -2, scale: 1.02 }}
-                className="flex items-start gap-2.5 rounded-lg bg-[#111820]/80 border border-slate-800 p-3 transition-all hover:border-slate-700"
+                className="flex items-start gap-2.5 rounded-lg bg-[#122240]/80 border border-slate-800 p-3 transition-all hover:border-slate-700"
               >
                 <FIcon className={`h-4 w-4 mt-0.5 ${color} shrink-0`} />
                 <span className="text-sm text-slate-300 leading-relaxed">{text}</span>
@@ -124,7 +124,7 @@ export default function MCPIntegration() {
               href="https://pypi.org/project/yt-transcript-mcp/"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-lg border border-[#2962FF]/50 bg-[#2962FF]/10 px-4 py-2.5 text-sm font-medium text-[#8fb3ff] hover:bg-[#2962FF]/20 transition-all"
+              className="inline-flex items-center gap-2 rounded-lg border border-[#00D4FF]/50 bg-[#00D4FF]/10 px-4 py-2.5 text-sm font-medium text-[#7AE8FF] hover:bg-[#00D4FF]/20 transition-all"
             >
               <Sparkles className="h-4 w-4" />
               PyPI Package
@@ -135,7 +135,7 @@ export default function MCPIntegration() {
               href={REPO_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-lg border border-slate-700 bg-[#181818] px-4 py-2.5 text-sm font-medium text-slate-200 hover:border-slate-600 transition-all"
+              className="inline-flex items-center gap-2 rounded-lg border border-slate-700 bg-[#122240] px-4 py-2.5 text-sm font-medium text-slate-200 hover:border-slate-600 transition-all"
             >
               GitHub Repository
             </motion.a>
@@ -169,7 +169,7 @@ export default function MCPIntegration() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5, duration: 0.5 }}
-        className="rounded-2xl border border-slate-800 bg-[#141414] p-6"
+        className="rounded-2xl border border-slate-800 bg-[#122240] p-6"
       >
         <h3 className="text-xl font-semibold text-slate-100 mb-4">Available Tools</h3>
         <div className="overflow-x-auto">
@@ -194,7 +194,7 @@ export default function MCPIntegration() {
                   transition={{ delay: 0.6 + idx * 0.1 }}
                   className="border-b border-slate-800/50 last:border-0 hover:bg-slate-800/20 transition-colors"
                 >
-                  <td className="py-3 px-4 font-mono text-[#00E676] text-sm">{tool.name}</td>
+                  <td className="py-3 px-4 font-mono text-[#C8A941] text-sm">{tool.name}</td>
                   <td className="py-3 px-4">{tool.desc}</td>
                 </motion.tr>
               ))}

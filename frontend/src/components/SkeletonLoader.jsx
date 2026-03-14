@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 
 export default function SkeletonLoader({ lines = 5 }) {
   return (
-    <div className="h-[56vh] overflow-y-auto rounded-xl border border-slate-800 bg-[#111111] p-3 custom-scrollbar">
+    <div className="h-[56vh] overflow-y-auto rounded-xl border border-slate-800 bg-[#0A1820] p-3 custom-scrollbar">
       <ul className="space-y-2">
         {Array.from({ length: lines }).map((_, index) => (
           <motion.li
@@ -10,7 +10,7 @@ export default function SkeletonLoader({ lines = 5 }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: index * 0.08, duration: 0.3 }}
-            className="grid grid-cols-[auto_1fr] gap-3 rounded-lg bg-[#171717] px-4 py-3"
+            className="grid grid-cols-[auto_1fr] gap-3 rounded-lg bg-[#0A1832] px-4 py-3"
           >
             {/* Timestamp skeleton - pill shape */}
             <div className="flex items-center">

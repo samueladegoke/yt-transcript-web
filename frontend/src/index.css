@@ -4,36 +4,55 @@
 
 @layer base {
   :root {
-    --background: 0 0% 2%; /* #050505 */
-    --foreground: 0 0% 98%;
+    /* E.T.D Brand — Navy backgrounds */
+    --background: 215 67% 11%; /* #0A1832 */
+    --foreground: 0 0% 98%; /* white */
 
-    --card: 0 0% 4%;
+    --card: 217 57% 16%; /* #122240 */
     --card-foreground: 0 0% 98%;
 
-    --popover: 0 0% 4%;
+    --popover: 217 57% 16%; /* #122240 */
     --popover-foreground: 0 0% 98%;
 
-    --primary: 144 95% 55%; /* #1ff976 */
-    --primary-foreground: 0 0% 2%; 
+    /* E.T.D Brand — Gold primary */
+    --primary: 47 60% 52%; /* #C8A941 */
+    --primary-foreground: 215 67% 11%; /* navy — dark text on gold */
 
-    --secondary: 0 0% 8%;
+    /* E.T.D Brand — Navy-mid secondary */
+    --secondary: 217 57% 16%; /* #122240 */
     --secondary-foreground: 0 0% 98%;
 
-    --muted: 0 0% 12%;
+    --muted: 217 50% 20%; /* slightly lighter navy */
     --muted-foreground: 0 0% 60%;
 
-    --accent: 0 0% 12%;
+    --accent: 217 50% 20%;
     --accent-foreground: 0 0% 98%;
 
-    --destructive: 9 95% 60%; /* #fa5538 */
+    --destructive: 9 95% 60%; /* #fa5538 — unchanged */
     --destructive-foreground: 0 0% 98%;
 
-    --info: 184 100% 50%; /* #00f0ff */
+    /* E.T.D Brand — Cyan info */
+    --info: 193 100% 50%; /* #00D4FF */
 
-    --border: 0 0% 12%;
-    --input: 0 0% 12%;
-    --ring: 144 95% 55%;
+    --border: 217 50% 20%; /* navy-based border */
+    --input: 217 50% 20%;
+    --ring: 47 60% 52%; /* gold ring */
     --radius: 0.5rem;
+
+    /* E.T.D Brand — raw tokens for direct use */
+    --etd-navy: #0A1832;
+    --etd-navy-mid: #122240;
+    --etd-navy-text: #15263D;
+    --etd-gold: #C8A941;
+    --etd-gold-highlight: #E8C85A;
+    --etd-gold-shadow: #8B7229;
+    --etd-gold-deep: #6B5A22;
+    --etd-gold-text: #A08040;
+    --etd-cyan: #00D4FF;
+    --etd-cyan-bright: #7AE8FF;
+    --etd-cyan-shadow: #0099BB;
+    --etd-white: #FFFFFF;
+    --etd-halo: #CCE8FF;
   }
 
   /* Sleek scrollbar */
@@ -47,11 +66,11 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-slate-700 rounded-full transition-colors;
+    @apply bg-[#1a3050] rounded-full transition-colors;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-slate-600;
+    @apply bg-[#254060];
   }
 }
 
@@ -73,20 +92,32 @@
 }
 
 @layer utilities {
+  /* ─── Glassmorphism (E.T.D navy-tinted) ─── */
   .glassmorphism {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(10, 24, 50, 0.4);
+    border: 1px solid rgba(200, 169, 65, 0.08);
   }
+
+  /* ─── Neon Glow — Gold (primary) ─── */
   .neon-glow-primary {
-    box-shadow: 0 0 15px rgba(31, 249, 118, 0.15);
+    box-shadow: 0 0 15px rgba(200, 169, 65, 0.2);
   }
+
+  /* ─── Neon Glow — Danger ─── */
   .neon-glow-danger {
     box-shadow: 0 0 15px rgba(250, 85, 56, 0.15);
   }
+
+  /* ─── Neon Glow — Cyan (info) ─── */
   .neon-glow-info {
-    box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
+  }
+
+  /* ─── Neon Glow — Halo (white/cyan blend) ─── */
+  .neon-glow-halo {
+    box-shadow: 0 0 20px rgba(204, 232, 255, 0.12);
   }
 
   /* Fade in animation */
@@ -105,24 +136,38 @@
     }
   }
 
-  /* Pulse glow animation for buttons */
+  /* Pulse glow animation — gold */
   .animate-pulse-glow {
     animation: pulseGlow 2s infinite;
   }
 
   @keyframes pulseGlow {
     0%, 100% {
-      box-shadow: 0 0 15px rgba(0, 230, 118, 0.15);
+      box-shadow: 0 0 15px rgba(200, 169, 65, 0.15);
     }
     50% {
-      box-shadow: 0 0 25px rgba(0, 230, 118, 0.25);
+      box-shadow: 0 0 25px rgba(200, 169, 65, 0.3);
+    }
+  }
+
+  /* Pulse glow — cyan variant */
+  .animate-pulse-glow-cyan {
+    animation: pulseGlowCyan 2s infinite;
+  }
+
+  @keyframes pulseGlowCyan {
+    0%, 100% {
+      box-shadow: 0 0 15px rgba(0, 212, 255, 0.15);
+    }
+    50% {
+      box-shadow: 0 0 25px rgba(0, 212, 255, 0.3);
     }
   }
 
   /* Custom scrollbar container */
   .custom-scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: #475569 transparent;
+    scrollbar-color: #1a3050 transparent;
   }
   .custom-scrollbar::-webkit-scrollbar {
     width: 6px;
@@ -132,11 +177,11 @@
     background: transparent;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #475569;
+    background: #1a3050;
     border-radius: 9999px;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #64748b;
+    background: #254060;
   }
 
   /* Shimmer effect for loading states */
@@ -144,9 +189,9 @@
     animation: shimmer 2s infinite;
     background: linear-gradient(
       90deg,
-      rgba(255, 255, 255, 0) 0%,
-      rgba(255, 255, 255, 0.03) 50%,
-      rgba(255, 255, 255, 0) 100%
+      rgba(200, 169, 65, 0) 0%,
+      rgba(200, 169, 65, 0.04) 50%,
+      rgba(200, 169, 65, 0) 100%
     );
     background-size: 200% 100%;
   }
@@ -164,7 +209,7 @@
   .skeleton-shimmer {
     position: relative;
     overflow: hidden;
-    background: #1e293b;
+    background: #122240;
   }
   .skeleton-shimmer::after {
     content: '';
@@ -173,7 +218,7 @@
     background: linear-gradient(
       90deg,
       transparent 0%,
-      rgba(255, 255, 255, 0.04) 50%,
+      rgba(200, 169, 65, 0.04) 50%,
       transparent 100%
     );
     animation: shimmerSlide 1.5s infinite;
@@ -202,9 +247,9 @@
     }
   }
 
-  /* Gradient text animation */
+  /* Gradient text animation — E.T.D gold ↔ cyan */
   .text-gradient-animate {
-    background: linear-gradient(90deg, #00E676, #2962FF, #00E676);
+    background: linear-gradient(90deg, #C8A941, #00D4FF, #C8A941);
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -218,5 +263,77 @@
     100% {
       background-position: 200% center;
     }
+  }
+
+  /* ─── E.T.D Brand Utilities ─── */
+
+  /* Gold gradient background */
+  .bg-etd-gold-gradient {
+    background: linear-gradient(135deg, #C8A941 0%, #E8C85A 50%, #8B7229 100%);
+  }
+
+  /* Cyan gradient background */
+  .bg-etd-cyan-gradient {
+    background: linear-gradient(135deg, #0099BB 0%, #00D4FF 50%, #7AE8FF 100%);
+  }
+
+  /* Navy depth gradient */
+  .bg-etd-navy-gradient {
+    background: linear-gradient(180deg, #0A1832 0%, #122240 100%);
+  }
+
+  /* Gold text color */
+  .text-etd-gold {
+    color: #C8A941;
+  }
+
+  /* Cyan text color */
+  .text-etd-cyan {
+    color: #00D4FF;
+  }
+
+  /* Halo text color */
+  .text-etd-halo {
+    color: #CCE8FF;
+  }
+
+  /* Gold border */
+  .border-etd-gold {
+    border-color: rgba(200, 169, 65, 0.3);
+  }
+
+  /* Cyan border */
+  .border-etd-cyan {
+    border-color: rgba(0, 212, 255, 0.3);
+  }
+
+  /* Gold underline accent */
+  .accent-underline-gold {
+    position: relative;
+  }
+  .accent-underline-gold::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, #C8A941, #E8C85A);
+    border-radius: 1px;
+  }
+
+  /* Cyan underline accent */
+  .accent-underline-cyan {
+    position: relative;
+  }
+  .accent-underline-cyan::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, #0099BB, #00D4FF);
+    border-radius: 1px;
   }
 }

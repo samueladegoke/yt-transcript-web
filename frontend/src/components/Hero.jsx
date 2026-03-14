@@ -7,7 +7,7 @@ export default function Hero() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: 'easeOut' }}
-      className="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-br from-[#161616] via-[#121212] to-[#14192b] p-8 sm:p-12 mb-8"
+      className="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-br from-[#122240] via-[#0A1832] to-[#14192b] p-8 sm:p-12 mb-8"
     >
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
@@ -21,7 +21,7 @@ export default function Hero() {
             repeat: Infinity,
             ease: 'easeInOut',
           }}
-          className="absolute -top-1/2 -right-1/2 w-full h-full bg-[#00E676]/10 rounded-full blur-3xl"
+          className="absolute -top-1/2 -right-1/2 w-full h-full bg-[#C8A941]/10 rounded-full blur-3xl"
         />
         <motion.div
           animate={{
@@ -34,7 +34,7 @@ export default function Hero() {
             ease: 'easeInOut',
             delay: 1,
           }}
-          className="absolute -bottom-1/2 -left-1/2 w-full h-full bg-[#2962FF]/10 rounded-full blur-3xl"
+          className="absolute -bottom-1/2 -left-1/2 w-full h-full bg-[#00D4FF]/10 rounded-full blur-3xl"
         />
       </div>
 
@@ -44,10 +44,10 @@ export default function Hero() {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2, duration: 0.5 }}
-          className="inline-flex items-center gap-2 rounded-full border border-[#2962FF]/50 bg-[#2962FF]/10 px-4 py-1.5 text-xs font-medium text-[#8fb3ff] mb-6"
+          className="inline-flex items-center gap-3 rounded-full border border-[#00D4FF]/50 bg-[#00D4FF]/10 px-4 py-2 mb-6"
         >
-          <Sparkles className="h-3.5 w-3.5" />
-          <span>E.T.D Transcript Engine</span>
+          <img src="/assets/brand/E.T.D_logo_f4.png" alt="E.T.D" className="h-8 w-auto" />
+          <span className="text-xs font-medium text-[#7AE8FF]">Elohim Tech Dynamics</span>
         </motion.div>
 
         <motion.h1
@@ -57,7 +57,7 @@ export default function Hero() {
           className="text-4xl font-bold tracking-tight text-slate-100 sm:text-5xl lg:text-6xl"
         >
           YouTube Transcript
-          <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#00E676] to-[#2962FF]">
+          <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#C8A941] to-[#00D4FF]">
             Interface
           </span>
         </motion.h1>
@@ -77,15 +77,15 @@ export default function Hero() {
           transition={{ delay: 0.5, duration: 0.5 }}
           className="mt-6 flex flex-wrap gap-3"
         >
-          <div className="inline-flex items-center gap-2 rounded-lg bg-[#111820] border border-slate-800 px-3 py-1.5 text-sm text-slate-400">
-            <Zap className="h-4 w-4 text-[#00E676]" />
+          <div className="inline-flex items-center gap-2 rounded-lg bg-[#122240] border border-slate-800 px-3 py-1.5 text-sm text-slate-400">
+            <Zap className="h-4 w-4 text-[#C8A941]" />
             <span>Instant Extraction</span>
           </div>
-          <div className="inline-flex items-center gap-2 rounded-lg bg-[#111820] border border-slate-800 px-3 py-1.5 text-sm text-slate-400">
-            <Play className="h-4 w-4 text-[#2962FF]" />
+          <div className="inline-flex items-center gap-2 rounded-lg bg-[#122240] border border-slate-800 px-3 py-1.5 text-sm text-slate-400">
+            <Play className="h-4 w-4 text-[#00D4FF]" />
             <span>Multi-language</span>
           </div>
-          <div className="inline-flex items-center gap-2 rounded-lg bg-[#111820] border border-slate-800 px-3 py-1.5 text-sm text-slate-400">
+          <div className="inline-flex items-center gap-2 rounded-lg bg-[#122240] border border-slate-800 px-3 py-1.5 text-sm text-slate-400">
             <Sparkles className="h-4 w-4 text-purple-400" />
             <span>AI-Ready</span>
           </div>

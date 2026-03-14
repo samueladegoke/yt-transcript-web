@@ -9,21 +9,21 @@ const tabs = [
 export default function TabNavigation({ activeTab, onTabChange, children }) {
   return (
     <div>
-      <nav className="mb-6 flex gap-1 rounded-xl border border-slate-800 bg-[#111111] p-1">
+      <nav className="mb-6 flex gap-1 rounded-xl border border-slate-800 bg-[#0A1820] p-1">
         {tabs.map(({ id, label, icon: Icon }) => (
           <button
             key={id}
             onClick={() => onTabChange(id)}
             className={`relative flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-all ${
               activeTab === id
-                ? 'text-[#00E676]'
+                ? 'text-[#C8A941]'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
             }`}
           >
             {activeTab === id && (
               <motion.div
                 layoutId="activeTab"
-                className="absolute inset-0 rounded-lg bg-[#00E676]/10 border border-[#00E676]/30"
+                className="absolute inset-0 rounded-lg bg-[#C8A941]/10 border border-[#C8A941]/30"
                 initial={false}
                 transition={{ type: 'spring', stiffness: 500, damping: 30 }}
               />

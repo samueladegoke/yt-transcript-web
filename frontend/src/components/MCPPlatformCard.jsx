@@ -7,12 +7,12 @@ const platformColors = {
   'VS Code (Copilot)': { bg: 'from-[#22c55e]/10 to-[#166534]/5', border: 'border-green-500/20', iconBg: 'bg-green-500/10', text: 'text-green-400' },
   'Windsurf': { bg: 'from-[#a855f7]/10 to-[#6b21a8]/5', border: 'border-purple-500/20', iconBg: 'bg-purple-500/10', text: 'text-purple-400' },
   'Cline': { bg: 'from-[#f43f5e]/10 to-[#9f1239]/5', border: 'border-rose-500/20', iconBg: 'bg-rose-500/10', text: 'text-rose-400' },
-  'OpenClaw': { bg: 'from-[#00E676]/10 to-[#047857]/5', border: 'border-[#00E676]/20', iconBg: 'bg-[#00E676]/10', text: 'text-[#00E676]' },
+  'OpenClaw': { bg: 'from-[#C8A941]/10 to-[#047857]/5', border: 'border-[#C8A941]/20', iconBg: 'bg-[#C8A941]/10', text: 'text-[#C8A941]' },
   'Generic MCP Host': { bg: 'from-[#6366f1]/10 to-[#4338ca]/5', border: 'border-indigo-500/20', iconBg: 'bg-indigo-500/10', text: 'text-indigo-400' },
 };
 
 export default function MCPPlatformCard({ name, description, icon, configBlocks }) {
-  const colors = platformColors[name] || { bg: 'from-[#2962FF]/10 to-[#1e3a8a]/5', border: 'border-[#2962FF]/20', iconBg: 'bg-[#2962FF]/10', text: 'text-[#8fb3ff]' };
+  const colors = platformColors[name] || { bg: 'from-[#00D4FF]/10 to-[#1e3a8a]/5', border: 'border-[#00D4FF]/20', iconBg: 'bg-[#00D4FF]/10', text: 'text-[#7AE8FF]' };
 
   return (
     <motion.div

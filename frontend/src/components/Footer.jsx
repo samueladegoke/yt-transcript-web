@@ -20,7 +20,7 @@ export default function Footer() {
             href={REPO_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-[#00E676] transition-colors"
+            className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-[#C8A941] transition-colors"
           >
             <Github className="h-4 w-4" />
             <span>GitHub</span>
@@ -32,7 +32,7 @@ export default function Footer() {
             href="https://pypi.org/project/yt-transcript-mcp/"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-[#2962FF] transition-colors"
+            className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-[#00D4FF] transition-colors"
           >
             <BookOpen className="h-4 w-4" />
             <span>PyPI</span>
@@ -53,9 +53,10 @@ export default function Footer() {
 
         {/* Copyright */}
         <div className="flex items-center gap-2 text-sm text-slate-500">
-          <span>© {currentYear} YouTube Transcript</span>
-          <Heart className="h-3.5 w-3.5 text-red-500" />
-          <span>Built with OpenClaw</span>
+          <img src="/assets/brand/E.T.D_logo_f4.png" alt="E.T.D" className="h-6 w-auto opacity-70" />
+          <span>© {currentYear} E.T.D — Elohim Tech Dynamics</span>
+          <span className="text-slate-700">|</span>
+          <span className="text-[#C8A941]">YouTube Transcript Engine</span>
         </div>
       </div>
     </motion.footer>

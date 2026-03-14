@@ -11,17 +11,17 @@ export default function EmptyState() {
     >
       {/* Subtle gradient background glow */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute -top-1/2 -right-1/2 w-96 h-96 bg-[#00E676]/5 rounded-full blur-3xl" />
-        <div className="absolute -bottom-1/2 -left-1/2 w-96 h-96 bg-[#2962FF]/5 rounded-full blur-3xl" />
+        <div className="absolute -top-1/2 -right-1/2 w-96 h-96 bg-[#C8A941]/5 rounded-full blur-3xl" />
+        <div className="absolute -bottom-1/2 -left-1/2 w-96 h-96 bg-[#00D4FF]/5 rounded-full blur-3xl" />
       </div>
 
       {/* Animated icon container */}
       <motion.div
         animate={{ y: [0, -10, 0] }}
         transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-        className="relative mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-[#2962FF]/20 to-[#00E676]/20 border border-[#2962FF]/30"
+        className="relative mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-[#00D4FF]/20 to-[#C8A941]/20 border border-[#00D4FF]/30"
       >
-        <Clapperboard className="h-10 w-10 text-[#2962FF]" />
+        <Clapperboard className="h-10 w-10 text-[#00D4FF]" />
       </motion.div>
 
       <h3 className="relative z-10 text-xl font-semibold text-slate-100 mb-2">
@@ -34,7 +34,7 @@ export default function EmptyState() {
       </p>
 
       <div className="relative z-10 flex items-center gap-2 text-sm text-slate-500">
-        <Sparkles className="h-4 w-4 text-[#00E676]" />
+        <Sparkles className="h-4 w-4 text-[#C8A941]" />
         <span>Supports multiple languages</span>
       </div>
     </motion.div>
