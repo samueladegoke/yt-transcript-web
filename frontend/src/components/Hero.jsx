@@ -1,16 +1,38 @@
 import { motion } from 'framer-motion';
 import { Sparkles, Zap, Play } from 'lucide-react';
 
+// Unsplash photos fetched by design orchestrator
+const HERO_PHOTOS = [
+  'https://images.unsplash.com/photo-1765619574770-6c7b86e51ae2?w=1920&q=80&fit=max', // Abstract blue bokeh
+  'https://images.unsplash.com/photo-1715010895566-32db124e83e5?w=1920&q=80&fit=max', // Purple lines on black
+  'https://images.unsplash.com/photo-1759771963975-8a4885446f1f?w=1920&q=80&fit=max', // Purple ring of light
+];
+
+// Deterministic selection based on build (not random — consistent across renders)
+const HERO_PHOTO = HERO_PHOTOS[0];
+
 export default function Hero() {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: 'easeOut' }}
-      className="relative overflow-hidden rounded-3xl border border-white/[0.06] glassmorphism p-8 sm:p-12 mb-8"
+      className="relative overflow-hidden rounded-3xl border border-white/[0.06] glassmorphism mb-8"
     >
-      {/* Animated background orbs — gold + cyan */}
-      <div className="absolute inset-0 overflow-hidden">
+      {/* Real photo background — Unsplash hero image */}
+      <div className="absolute inset-0">
+        <img
+          src={HERO_PHOTO}
+          alt=""
+          loading="lazy"
+          className="absolute inset-0 w-full h-full object-cover opacity-25"
+        />
+        {/* Dark gradient overlay for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0A1832]/70 via-[#0A1832]/80 to-[#0A1832]/95" />
+      </div>
+
+      {/* Animated background orbs — gold + cyan (on top of photo) */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
           animate={{ scale: [1, 1.2, 1], opacity: [0.08, 0.14, 0.08] }}
           transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
@@ -26,7 +48,7 @@ export default function Hero() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10">
+      <div className="relative z-10 p-8 sm:p-12">
         {/* Watermark Logo — subliminal depth */}
         <img
           src="/assets/brand/E.T.D_logo_f4_transparent.png"
@@ -53,7 +75,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.5 }}
-          className="text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl"
+          className="text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl font-display"
         >
           YouTube Transcript
           <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#C8A941] via-[#E8C85A] to-[#00D4FF]">
@@ -90,6 +112,23 @@ export default function Hero() {
             <Sparkles className="h-4 w-4 text-purple-400" />
             <span>AI-Ready</span>
           </div>
+        </motion.div>
+
+        {/* Photo attribution — Unsplash credit (required by license) */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8, duration: 0.5 }}
+          className="mt-6 flex items-center gap-2 text-[11px] text-slate-400/80"
+        >
+          <span>Photo by</span>
+          <a href="https://unsplash.com/@neelakshi_singh" target="_blank" rel="noopener noreferrer" className="underline decoration-slate-600/30 hover:text-slate-400 transition-colors">
+            Neelakshi Singh
+          </a>
+          <span>on</span>
+          <a href="https://unsplash.com" target="_blank" rel="noopener noreferrer" className="underline decoration-slate-600/30 hover:text-slate-400 transition-colors">
+            Unsplash
+          </a>
         </motion.div>
       </div>
     </motion.div>

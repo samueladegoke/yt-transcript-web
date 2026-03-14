@@ -43,6 +43,15 @@ export default function MCPIntegration() {
         transition={{ duration: 0.5 }}
         className="relative overflow-hidden rounded-2xl border border-slate-800 bg-gradient-to-br from-[#122240] via-[#0A1832] to-[#14192b] p-6 sm:p-8"
       >
+        {/* Real photo background — developer workspace */}
+        <img
+          src="https://images.unsplash.com/photo-1753715613382-dc3e8456dbc9?w=1200&q=80&fit=max"
+          alt=""
+          loading="lazy"
+          className="absolute inset-0 w-full h-full object-cover opacity-10"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0A1832]/90 via-[#0A1832]/70 to-transparent" />
+
         {/* Animated background glow */}
         <motion.div
           animate={{ scale: [1, 1.1, 1], opacity: [0.08, 0.12, 0.08] }}
