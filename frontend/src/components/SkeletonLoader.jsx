@@ -12,20 +12,20 @@ export default function SkeletonLoader({ lines = 5 }) {
             transition={{ delay: index * 0.08, duration: 0.3 }}
             className="grid grid-cols-[auto_1fr] gap-3 rounded-lg bg-[#171717] px-4 py-3"
           >
-            {/* Timestamp skeleton */}
+            {/* Timestamp skeleton - pill shape */}
             <div className="flex items-center">
-              <div className="h-6 w-20 rounded-full bg-slate-800 animate-pulse" />
+              <div className="h-6 w-20 rounded-full skeleton-shimmer" />
             </div>
 
             {/* Text skeleton lines */}
             <div className="space-y-2.5 py-0.5">
               <div
-                className="h-4 rounded bg-slate-800 animate-pulse"
+                className="h-4 rounded skeleton-shimmer"
                 style={{ width: `${60 + (index * 7) % 30}%` }}
               />
               <div
-                className="h-4 rounded bg-slate-800/70 animate-pulse"
-                style={{ width: `${30 + (index * 11) % 40}%` }}
+                className="h-4 rounded skeleton-shimmer"
+                style={{ width: `${30 + (index * 11) % 40}%`, animationDelay: '0.2s' }}
               />
             </div>
           </motion.li>
