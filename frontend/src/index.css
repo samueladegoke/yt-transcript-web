@@ -119,6 +119,26 @@
     }
   }
 
+  /* Custom scrollbar container */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #475569 transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #475569;
+    border-radius: 9999px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+  }
+
   /* Shimmer effect for loading states */
   .animate-shimmer {
     animation: shimmer 2s infinite;
@@ -137,6 +157,34 @@
     }
     100% {
       background-position: 200% 0;
+    }
+  }
+
+  /* Shimmer pulse for skeleton */
+  .skeleton-shimmer {
+    position: relative;
+    overflow: hidden;
+    background: #1e293b;
+  }
+  .skeleton-shimmer::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.04) 50%,
+      transparent 100%
+    );
+    animation: shimmerSlide 1.5s infinite;
+  }
+
+  @keyframes shimmerSlide {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
     }
   }
 
