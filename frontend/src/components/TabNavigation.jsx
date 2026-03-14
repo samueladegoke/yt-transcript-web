@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import { FileText, Plug } from 'lucide-react';
 
 const tabs = [
@@ -13,18 +14,35 @@ export default function TabNavigation({ activeTab, onTabChange, children }) {
           <button
             key={id}
             onClick={() => onTabChange(id)}
-            className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition ${
+            className={`relative flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-all ${
               activeTab === id
-                ? 'bg-[#00E676]/10 text-[#00E676] border border-[#00E676]/30'
-                : 'text-slate-400 hover:text-slate-200 border border-transparent'
+                ? 'text-[#00E676]'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
             }`}
           >
-            <Icon className="h-4 w-4" />
-            {label}
+            {activeTab === id && (
+              <motion.div
+                layoutId="activeTab"
+                className="absolute inset-0 rounded-lg bg-[#00E676]/10 border border-[#00E676]/30"
+                initial={false}
+                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+              />
+            )}
+            <span className="relative z-10 flex items-center gap-2">
+              <Icon className="h-4 w-4" />
+              {label}
+            </span>
           </button>
         ))}
       </nav>
-      {children}
+      <motion.div
+        key={activeTab}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        {children}
+      </motion.div>
     </div>
   );
 }

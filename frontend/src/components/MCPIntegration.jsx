@@ -1,4 +1,5 @@
-import { Terminal, Zap, BookOpen, Plug } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Terminal, Zap, BookOpen, Plug, Sparkles } from 'lucide-react';
 import MCPPlatformCard from './MCPPlatformCard';
 
 const REPO_URL = 'https://github.com/samueladegoke/yt-transcript';
@@ -26,72 +27,181 @@ const platforms = [
 ];
 
 const features = [
-  { icon: Terminal, text: 'Get full transcripts from any YouTube video' },
-  { icon: Zap, text: 'Fetch video metadata (title, channel, views)' },
-  { icon: BookOpen, text: 'Analyze: summaries, outlines, key points' },
-  { icon: Plug, text: 'Zero-config proxy mode — no API keys needed' },
+  { icon: Terminal, text: 'Get full transcripts from any YouTube video', color: 'text-[#00E676]' },
+  { icon: Zap, text: 'Fetch video metadata (title, channel, views)', color: 'text-[#ffb86c]' },
+  { icon: BookOpen, text: 'Analyze: summaries, outlines, key points', color: 'text-[#8fb3ff]' },
+  { icon: Plug, text: 'Zero-config proxy mode — no API keys needed', color: 'text-purple-400' },
 ];
 
 export default function MCPIntegration() {
   return (
     <div className="space-y-8">
-      <section className="rounded-2xl border border-slate-800 bg-gradient-to-br from-[#161616] via-[#121212] to-[#14192b] p-6 sm:p-8">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#2962FF]/10 text-[#8fb3ff]">
-            <Plug className="h-6 w-6" />
-          </div>
-          <div>
-            <h2 className="text-2xl font-semibold text-slate-100">MCP Integration</h2>
-            <p className="text-sm text-slate-400">Connect YouTube Transcript to your AI tools</p>
-          </div>
-        </div>
-        <p className="text-slate-300 max-w-3xl">
-          The <strong>Model Context Protocol (MCP)</strong> lets AI assistants like Claude, Cursor, and VS Code Copilot access YouTube transcripts directly. Ask your AI to "get the transcript for this video" — and it just works.
-        </p>
-        <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {features.map(({ icon: FIcon, text }, idx) => (
-            <div key={idx} className="flex items-start gap-2 rounded-lg bg-[#111820] border border-slate-800 p-3">
-              <FIcon className="h-4 w-4 mt-0.5 text-[#00E676] shrink-0" />
-              <span className="text-sm text-slate-300">{text}</span>
-            </div>
-          ))}
-        </div>
-        <div className="mt-6 flex flex-wrap gap-3">
-          <a href="https://pypi.org/project/yt-transcript-mcp/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-lg border border-[#2962FF]/50 bg-[#2962FF]/10 px-4 py-2 text-sm font-medium text-[#8fb3ff] hover:bg-[#2962FF]/20 transition">
-            PyPI Package
-          </a>
-          <a href={REPO_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-lg border border-slate-700 bg-[#181818] px-4 py-2 text-sm font-medium text-slate-200 hover:border-slate-600 transition">
-            GitHub Repository
-          </a>
-        </div>
-      </section>
+      {/* Header Section */}
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="relative overflow-hidden rounded-2xl border border-slate-800 bg-gradient-to-br from-[#161616] via-[#121212] to-[#14192b] p-6 sm:p-8"
+      >
+        {/* Animated background glow */}
+        <motion.div
+          animate={{ scale: [1, 1.1, 1], opacity: [0.08, 0.12, 0.08] }}
+          transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute top-0 right-0 w-1/2 h-full bg-[#2962FF]/10 rounded-full blur-3xl"
+        />
 
-      <section>
+        <div className="relative z-10">
+          <div className="flex items-center gap-4 mb-4">
+            <motion.div
+              animate={{ rotate: [0, 5, -5, 0] }}
+              transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+              className="flex h-14 w-14 items-center justify-center rounded-xl bg-[#2962FF]/10 border border-[#2962FF]/20"
+            >
+              <Plug className="h-7 w-7 text-[#8fb3ff]" />
+            </motion.div>
+            <div>
+              <motion.h2
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 }}
+                className="text-2xl font-bold text-slate-100"
+              >
+                MCP Integration
+              </motion.h2>
+              <motion.p
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
+                className="text-sm text-slate-400"
+              >
+                Connect YouTube Transcript to your AI tools
+              </motion.p>
+            </div>
+          </div>
+
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="text-slate-300 max-w-3xl leading-relaxed"
+          >
+            The <strong className="text-slate-100">Model Context Protocol (MCP)</strong> lets AI assistants like Claude, Cursor, and VS Code Copilot access YouTube transcripts directly. 
+            Ask your AI to "get the transcript for this video" — and it just works.
+          </motion.p>
+
+          {/* Feature Cards */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
+          >
+            {features.map(({ icon: FIcon, text, color }, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 + idx * 0.1 }}
+                whileHover={{ y: -2, scale: 1.02 }}
+                className="flex items-start gap-2.5 rounded-lg bg-[#111820]/80 border border-slate-800 p-3 transition-all hover:border-slate-700"
+              >
+                <FIcon className={`h-4 w-4 mt-0.5 ${color} shrink-0`} />
+                <span className="text-sm text-slate-300 leading-relaxed">{text}</span>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Links */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+            className="mt-6 flex flex-wrap gap-3"
+          >
+            <motion.a
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              href="https://pypi.org/project/yt-transcript-mcp/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-lg border border-[#2962FF]/50 bg-[#2962FF]/10 px-4 py-2.5 text-sm font-medium text-[#8fb3ff] hover:bg-[#2962FF]/20 transition-all"
+            >
+              <Sparkles className="h-4 w-4" />
+              PyPI Package
+            </motion.a>
+            <motion.a
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              href={REPO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-lg border border-slate-700 bg-[#181818] px-4 py-2.5 text-sm font-medium text-slate-200 hover:border-slate-600 transition-all"
+            >
+              GitHub Repository
+            </motion.a>
+          </motion.div>
+        </div>
+      </motion.section>
+
+      {/* Platform Cards */}
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3, duration: 0.5 }}
+      >
         <h3 className="text-xl font-semibold text-slate-100 mb-4">Setup by Platform</h3>
         <div className="grid gap-6 lg:grid-cols-2">
-          {platforms.map((p, idx) => (<MCPPlatformCard key={idx} {...p} />))}
+          {platforms.map((p, idx) => (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 + idx * 0.08 }}
+            >
+              <MCPPlatformCard {...p} />
+            </motion.div>
+          ))}
         </div>
-      </section>
+      </motion.section>
 
-      <section className="rounded-2xl border border-slate-800 bg-[#141414] p-6">
+      {/* Available Tools Table */}
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5, duration: 0.5 }}
+        className="rounded-2xl border border-slate-800 bg-[#141414] p-6"
+      >
         <h3 className="text-xl font-semibold text-slate-100 mb-4">Available Tools</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-slate-800">
-                <th className="text-left py-2 text-slate-400 font-medium">Tool</th>
-                <th className="text-left py-2 text-slate-400 font-medium">Description</th>
+                <th className="text-left py-3 px-4 text-slate-400 font-medium">Tool</th>
+                <th className="text-left py-3 px-4 text-slate-400 font-medium">Description</th>
               </tr>
             </thead>
             <tbody className="text-slate-300">
-              <tr className="border-b border-slate-800/50"><td className="py-2 font-mono text-[#00E676]">get_transcript(url, lang)</td><td className="py-2">Fetch full transcript from a YouTube video</td></tr>
-              <tr className="border-b border-slate-800/50"><td className="py-2 font-mono text-[#00E676]">get_video_info(url)</td><td className="py-2">Get video metadata (title, channel, duration)</td></tr>
-              <tr className="border-b border-slate-800/50"><td className="py-2 font-mono text-[#00E676]">analyze(url, type)</td><td className="py-2">Analyze transcript (summary, outline, key_points)</td></tr>
-              <tr><td className="py-2 font-mono text-[#00E676]">check_health()</td><td className="py-2">Verify backend connectivity</td></tr>
+              {[
+                { name: 'get_transcript(url, lang)', desc: 'Fetch full transcript from a YouTube video' },
+                { name: 'get_video_info(url)', desc: 'Get video metadata (title, channel, duration)' },
+                { name: 'analyze(url, type)', desc: 'Analyze transcript (summary, outline, key_points)' },
+                { name: 'check_health()', desc: 'Verify backend connectivity' },
+              ].map((tool, idx) => (
+                <motion.tr
+                  key={idx}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.6 + idx * 0.1 }}
+                  className="border-b border-slate-800/50 last:border-0 hover:bg-slate-800/20 transition-colors"
+                >
+                  <td className="py-3 px-4 font-mono text-[#00E676] text-sm">{tool.name}</td>
+                  <td className="py-3 px-4">{tool.desc}</td>
+                </motion.tr>
+              ))}
             </tbody>
           </table>
         </div>
-      </section>
+      </motion.section>
     </div>
   );
 }
