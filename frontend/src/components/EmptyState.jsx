@@ -1,42 +1,45 @@
 import { motion } from 'framer-motion';
-import { Sparkles, Clapperboard } from 'lucide-react';
+import { Film, Languages, Sparkles } from 'lucide-react';
 
 export default function EmptyState() {
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.4 }}
-      className="relative flex flex-col items-center justify-center py-16 text-center overflow-hidden"
-    >
-      {/* Subtle gradient background glow */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute -top-1/2 -right-1/2 w-96 h-96 bg-[#C8A941]/5 rounded-full blur-3xl" />
-        <div className="absolute -bottom-1/2 -left-1/2 w-96 h-96 bg-[#00D4FF]/5 rounded-full blur-3xl" />
+    <div className="relative overflow-hidden rounded-2xl border border-white/[0.04] glassmorphism p-10 sm:p-16 text-center">
+      {/* Background glow orbs */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-1/2 -right-1/4 w-96 h-96 bg-[#C8A941]/[0.04] rounded-full blur-[60px]" />
+        <div className="absolute -bottom-1/2 -left-1/4 w-96 h-96 bg-[#00D4FF]/[0.03] rounded-full blur-[60px]" />
       </div>
 
-      {/* Animated icon container */}
-      <motion.div
-        animate={{ y: [0, -10, 0] }}
-        transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-        className="relative mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-[#00D4FF]/20 to-[#C8A941]/20 border border-[#00D4FF]/30"
-      >
-        <Clapperboard className="h-10 w-10 text-[#00D4FF]" />
-      </motion.div>
+      <div className="relative z-10">
+        {/* Icon */}
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl border border-[#C8A941]/20 bg-[#C8A941]/[0.06]"
+        >
+          <Film className="h-10 w-10 text-[#C8A941]" />
+        </motion.div>
 
-      <h3 className="relative z-10 text-xl font-semibold text-slate-100 mb-2">
-        Paste a YouTube URL to Get Started
-      </h3>
+        <h3 className="text-xl font-semibold text-slate-200 mb-2">
+          Paste a YouTube URL to Get Started
+        </h3>
+        <p className="text-slate-400 max-w-md mx-auto mb-8">
+          Extract transcripts from any YouTube video. Supports multiple languages, timestamps, and export to TXT or Markdown.
+        </p>
 
-      <p className="relative z-10 max-w-md text-slate-400 mb-6">
-        Extract structured transcripts with timestamps, export to multiple formats,
-        and integrate with your favorite tools.
-      </p>
-
-      <div className="relative z-10 flex items-center gap-2 text-sm text-slate-500">
-        <Sparkles className="h-4 w-4 text-[#C8A941]" />
-        <span>Supports multiple languages</span>
+        {/* Feature hints */}
+        <div className="flex flex-wrap justify-center gap-4 text-sm text-slate-500">
+          <div className="flex items-center gap-2">
+            <Languages className="h-4 w-4 text-[#00D4FF]/60" />
+            <span>100+ languages</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-purple-400/60" />
+            <span>AI-ready format</span>
+          </div>
+        </div>
       </div>
-    </motion.div>
+    </div>
   );
 }

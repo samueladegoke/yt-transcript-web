@@ -2,8 +2,8 @@ import { motion } from 'framer-motion';
 
 export default function SkeletonLoader({ lines = 5 }) {
   return (
-    <div className="h-[56vh] overflow-y-auto rounded-xl border border-slate-800 bg-[#0A1820] p-3 custom-scrollbar">
-      <ul className="space-y-2">
+    <div className="h-[56vh] overflow-y-auto rounded-xl border border-white/[0.04] bg-[#0A1832]/40 backdrop-blur-sm p-3 custom-scrollbar">
+      <ul className="space-y-1.5">
         {Array.from({ length: lines }).map((_, index) => (
           <motion.li
             key={index}
