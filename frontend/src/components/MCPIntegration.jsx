@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { Terminal, Zap, BookOpen, Plug, Sparkles } from 'lucide-react';
 import MCPPlatformCard from './MCPPlatformCard';
 
-const REPO_URL = 'https://github.com/samueladegoke/yt-transcript';
+const REPO_URL = 'https://github.com/samueladegoke/yt-transcript-web';
 
 const mcpConfig = JSON.stringify({
   mcpServers: {
@@ -121,13 +121,13 @@ export default function MCPIntegration() {
             <motion.a
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              href="https://pypi.org/project/yt-transcript-mcp/"
+              href="https://github.com/samueladegoke/yt-transcript-web/tree/main/backend/app#readme"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-lg border border-[#00D4FF]/50 bg-[#00D4FF]/10 px-4 py-2.5 text-sm font-medium text-[#7AE8FF] hover:bg-[#00D4FF]/20 transition-all"
             >
               <Sparkles className="h-4 w-4" />
-              PyPI Package
+              MCP Server (GitHub)
             </motion.a>
             <motion.a
               whileHover={{ scale: 1.02 }}
@@ -184,7 +184,7 @@ export default function MCPIntegration() {
               {[
                 { name: 'get_transcript(url, lang)', desc: 'Fetch full transcript from a YouTube video' },
                 { name: 'get_video_info(url)', desc: 'Get video metadata (title, channel, duration)' },
-                { name: 'analyze(url, type)', desc: 'Analyze transcript (summary, outline, key_points)' },
+                { name: 'analyze(url, type)', desc: 'Analyze transcript: summary, outline, or key_points' },
                 { name: 'check_health()', desc: 'Verify backend connectivity' },
               ].map((tool, idx) => (
                 <motion.tr

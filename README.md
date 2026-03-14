@@ -14,26 +14,68 @@ Visit the live app: **https://yt-transcript-web.pages.dev**
 Paste any YouTube URL to extract and download transcripts as TXT or Markdown.
 
 ### MCP Integration
-Connect to your AI assistant in one command:
+Connect YouTube Transcript to your AI assistant. Works with Claude Desktop, Cursor, VS Code Copilot, Windsurf, Cline, OpenClaw, and any MCP-compatible host.
+
+#### Quick Install (one-liner, no setup)
 
 ```bash
-uvx --from "git+https://github.com/samueladegoke/yt-transcript.git#subdirectory=backend" yt-transcript-proxy
+uvx --from "git+https://github.com/samueladegoke/yt-transcript-web.git#subdirectory=backend" yt-transcript-proxy
 ```
 
-Add to your AI tool's MCP config:
+#### Add to MCP Config
+
+Add this to your AI tool's MCP config file (see platform-specific paths below):
 
 ```json
 {
   "mcpServers": {
     "youtube-transcript": {
       "command": "uvx",
-      "args": ["--from", "git+https://github.com/samueladegoke/yt-transcript.git#subdirectory=backend", "yt-transcript-proxy"]
+      "args": ["--from", "git+https://github.com/samueladegoke/yt-transcript-web.git#subdirectory=backend", "yt-transcript-proxy"]
     }
   }
 }
 ```
 
-Supported: Claude Desktop, Cursor, VS Code Copilot, Windsurf, Cline, OpenClaw, and any MCP-compatible host.
+#### Config File Locations by Platform
+
+| Platform | Config File Location |
+|----------|---------------------|
+| **Claude Desktop** (Mac) | `~/Library/Application Support/Claude/claude_desktop_config.json` |
+| **Claude Desktop** (Windows) | `%APPDATA%\Claude\claude_desktop_config.json` |
+| **Cursor** | `~/.cursor/mcp.json` or `.cursor/mcp.json` in project root |
+| **VS Code (Copilot)** | `.vscode/mcp.json` in project workspace |
+| **Windsurf** | Windsurf MCP settings (Settings → MCP) |
+| **Cline** | Cline MCP settings panel |
+| **OpenClaw** | `openclaw.json` → `mcpServers` section |
+
+#### Alternative: Install from Git (persistent)
+
+If you prefer a local install instead of `uvx`:
+
+```bash
+# Clone the repo
+git clone https://github.com/samueladegoke/yt-transcript-web.git
+cd yt-transcript-web/backend
+
+# Install dependencies
+pip install -e .
+
+# Then use in MCP config:
+# "command": "python", "args": ["-m", "app.mcp_proxy"]
+```
+
+#### Verify Installation
+
+Test that the MCP server works:
+
+```bash
+# Quick health check
+uvx --from "git+https://github.com/samueladegoke/yt-transcript-web.git#subdirectory=backend" yt-transcript-proxy --help
+
+# Or via mcporter (if installed)
+mcporter list youtube-transcript
+```
 
 ## Project Structure
 
