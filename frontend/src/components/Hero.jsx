@@ -46,7 +46,7 @@ export default function Hero() {
           transition={{ delay: 0.2, duration: 0.5 }}
           className="inline-flex items-center gap-3 rounded-full border border-[#00D4FF]/50 bg-[#00D4FF]/10 px-4 py-2 mb-6"
         >
-          <img src="/assets/brand/E.T.D_logo_f4.png" alt="E.T.D" className="h-8 w-auto" />
+          <img src="/assets/brand/E.T.D_logo_f4_transparent.png" alt="E.T.D" className="h-8 w-auto" />
           <span className="text-xs font-medium text-[#7AE8FF]">Elohim Tech Dynamics</span>
         </motion.div>
 

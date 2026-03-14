@@ -53,7 +53,7 @@ export default function Footer() {
 
         {/* Copyright */}
         <div className="flex items-center gap-2 text-sm text-slate-500">
-          <img src="/assets/brand/E.T.D_logo_f4.png" alt="E.T.D" className="h-6 w-auto opacity-70" />
+          <img src="/assets/brand/E.T.D_logo_f4_transparent.png" alt="E.T.D" className="h-6 w-auto opacity-70" />
           <span>© {currentYear} E.T.D — Elohim Tech Dynamics</span>
           <span className="text-slate-700">|</span>
           <span className="text-[#C8A941]">YouTube Transcript Engine</span>
