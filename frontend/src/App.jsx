@@ -114,6 +114,7 @@ function App() {
       <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
         <TabNavigation activeTab={activeTab} onTabChange={setActiveTab}>
           {activeTab === 'transcript' ? (
+        <>
         <section className="rounded-2xl border border-slate-800 bg-gradient-to-br from-[#161616] via-[#121212] to-[#14192b] p-6 shadow-[0_0_0_1px_rgba(0,230,118,0.06)] sm:p-10">
           <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#2962FF]/50 bg-[#2962FF]/10 px-3 py-1 text-xs font-medium text-[#8fb3ff]">
             <Sparkles className="h-3.5 w-3.5" />
@@ -207,7 +208,7 @@ function App() {
             </div>
           </section>
           ) : null}
-        </section>
+          </>
           ) : (
             <MCPIntegration />
           )}
