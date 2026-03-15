@@ -3,7 +3,6 @@ import { Terminal, Zap, BookOpen, Plug, Sparkles } from 'lucide-react';
 import MCPPlatformCard from './MCPPlatformCard';
 
 const REPO_URL = 'https://github.com/samueladegoke/yt-transcript-web';
-const SI = 'https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons';
 
 const mcpConfig = JSON.stringify({
   mcpServers: {
@@ -15,13 +14,13 @@ const mcpConfig = JSON.stringify({
 }, null, 2);
 
 const platforms = [
-  { name: 'Claude Desktop', description: "Anthropic's desktop AI assistant", icon: `${SI}/anthropic.svg`, configBlocks: [{ title: 'Add to claude_desktop_config.json', config: mcpConfig }] },
-  { name: 'Cursor', description: 'AI-powered code editor', icon: `${SI}/cursor.svg`, configBlocks: [{ title: 'Add to .cursor/mcp.json or ~/.cursor/mcp.json', config: mcpConfig }] },
-  { name: 'VS Code (Copilot)', description: 'GitHub Copilot with MCP support', icon: `${SI}/visualstudiocode.svg`, configBlocks: [{ title: 'Add to .vscode/mcp.json or settings.json', config: mcpConfig }] },
-  { name: 'Windsurf', description: "Codeium's AI IDE", icon: `${SI}/windsurf.svg`, configBlocks: [{ title: 'Add to Windsurf MCP config', config: mcpConfig }] },
-  { name: 'Cline', description: 'Autonomous AI coding agent', icon: `${SI}/cline.svg`, configBlocks: [{ title: 'Add to Cline MCP settings', config: mcpConfig }] },
-  { name: 'OpenClaw', description: 'Personal AI agent platform', icon: '🐱', configBlocks: [{ title: 'Add to openclaw.json (mcpServers)', config: mcpConfig }] },
-  { name: 'Generic MCP Host', description: 'Any MCP-compatible client', icon: '🔌', configBlocks: [
+  { name: 'Claude Desktop', description: "Anthropic's desktop AI assistant", icon: 'anthropic', configBlocks: [{ title: 'Add to claude_desktop_config.json', config: mcpConfig }] },
+  { name: 'Cursor', description: 'AI-powered code editor', icon: 'cursor', configBlocks: [{ title: 'Add to .cursor/mcp.json or ~/.cursor/mcp.json', config: mcpConfig }] },
+  { name: 'VS Code (Copilot)', description: 'GitHub Copilot with MCP support', icon: 'vscode', configBlocks: [{ title: 'Add to .vscode/mcp.json or settings.json', config: mcpConfig }] },
+  { name: 'Windsurf', description: "Codeium's AI IDE", icon: 'windsurf', configBlocks: [{ title: 'Add to Windsurf MCP config', config: mcpConfig }] },
+  { name: 'Cline', description: 'Autonomous AI coding agent', icon: 'cline', configBlocks: [{ title: 'Add to Cline MCP settings', config: mcpConfig }] },
+  { name: 'OpenClaw', description: 'Personal AI agent platform', icon: 'openclaw', configBlocks: [{ title: 'Add to openclaw.json (mcpServers)', config: mcpConfig }] },
+  { name: 'Generic MCP Host', description: 'Any MCP-compatible client', icon: 'generic-mcp', configBlocks: [
     { title: 'uvx (no install)', config: `uvx --from git+${REPO_URL}.git#subdirectory=backend yt-transcript-proxy`, language: 'bash' },
     { title: 'After pip install', config: 'yt-transcript-proxy', language: 'bash' }
   ]},
