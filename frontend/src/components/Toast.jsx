@@ -1,39 +1,51 @@
-import { useEffect } from 'react';
-import { CheckCircle2, AlertTriangle, Info, X } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { motion, useReducedMotion } from 'framer-motion';
+import { CheckCircle, XCircle, AlertCircle, X } from 'lucide-react';
 
-export function Toast({ message, type = 'info', onClose, duration = 5000 }) {
-    useEffect(() => {
-        if (duration > 0) {
-            const timer = setTimeout(onClose, duration);
-            return () => clearTimeout(timer);
-        }
-    }, [duration, onClose]);
+const typeStyles = {
+  success: {
+    icon: CheckCircle,
+    border: 'border-emerald-500/30',
+    bg: 'from-emerald-500/10 to-transparent',
+    glow: 'shadow-[0_0_30px_rgba(52,211,153,0.15)]',
+    iconColor: 'text-emerald-400',
+  },
+  error: {
+    icon: XCircle,
+    border: 'border-red-500/30',
+    bg: 'from-red-500/10 to-transparent',
+    glow: 'shadow-[0_0_30px_rgba(250,85,56,0.15)]',
+    iconColor: 'text-red-400',
+  },
+  warning: {
+    icon: AlertCircle,
+    border: 'border-[#C8A941]/30',
+    bg: 'from-[#C8A941]/10 to-transparent',
+    glow: 'shadow-[0_0_30px_rgba(200,169,65,0.15)]',
+    iconColor: 'text-[#E8C85A]',
+  },
+};
 
-    const bgColor = {
-        success: 'bg-green-500/90',
-        error: 'bg-red-500/90',
-        warning: 'bg-yellow-500/90',
-        info: 'bg-blue-500/90'
-    }[type];
+export default function Toast({ message, type = 'success', onClose }) {
+  const reduce = useReducedMotion();
+  const style = typeStyles[type] || typeStyles.success;
+  const Icon = style.icon;
 
-    const icon = {
-        success: <CheckCircle2 className="w-5 h-5" />,
-        error: <AlertTriangle className="w-5 h-5" />,
-        warning: <AlertTriangle className="w-5 h-5" />,
-        info: <Info className="w-5 h-5" />
-    }[type];
-
-    return (
-        <div className={cn(
-            "fixed top-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-lg text-white shadow-lg animate-in fade-in slide-in-from-right",
-            bgColor
-        )}>
-            {icon}
-            <span className="font-medium">{message}</span>
-            <button onClick={onClose} className="ml-2 hover:opacity-70">
-                <X className="w-4 h-4" />
-            </button>
-        </div>
-    );
+  return (
+    <motion.div
+      initial={reduce ? undefined : { opacity: 0, y: 20, scale: 0.95 }}
+      animate={reduce ? undefined : { opacity: 1, y: 0, scale: 1 }}
+      exit={reduce ? undefined : { opacity: 0, y: -10, scale: 0.95 }}
+      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+      role="status" aria-live="polite" aria-atomic="true"
+      className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-xl border ${style.border} bg-gradient-to-br ${style.bg} backdrop-blur-xl px-5 py-3.5 ${style.glow}`}
+    >
+      <Icon className={`h-5 w-5 flex-shrink-0 ${style.iconColor}`} />
+      <p className="text-sm font-medium text-slate-200 max-w-xs">{message}</p>
+      {onClose && (
+        <button type="button" aria-label="Close notification" onClick={onClose} className="ml-2 p-1 rounded-lg hover:bg-white/10 transition-colors">
+          <X className="h-4 w-4 text-slate-400" />
+        </button>
+      )}
+    </motion.div>
+  );
 }

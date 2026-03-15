@@ -24,7 +24,7 @@ export default function TranscriptDisplay({ lines, onLineClick }) {
   return (
     <div className="h-[56vh] overflow-y-auto rounded-xl border border-white/[0.04] bg-[#0A1832]/40 backdrop-blur-sm p-3 custom-scrollbar">
       <AnimatePresence>
-        <ul className="space-y-1.5">
+        <ul role="list" aria-label="Transcript lines" className="space-y-1.5">
           {lines.map((line, index) => (
             <motion.li
               key={`${line.seconds}-${index}`}

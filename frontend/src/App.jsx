@@ -110,8 +110,7 @@ function App() {
           {activeTab === 'transcript' ? (
             <>
               {/* Input Section — glassmorphism card with neon glow */}
-              <motion.section
-                initial={{ opacity: 0, y: 20 }}
+              <motion.section role="region"                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.5 }}
                 className="card-highlight rounded-2xl border border-white/[0.06] glassmorphism p-6 sm:p-10 shadow-[0_0_40px_rgba(200,169,65,0.06),0_8px_32px_rgba(0,0,0,0.2)]"
@@ -167,8 +166,7 @@ function App() {
 
               {/* Results Section */}
               {result ? (
-                <motion.section
-                  initial={{ opacity: 0, y: 20 }}
+                <motion.section role="region"                  initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5 }}
                   className="mt-8 rounded-2xl border border-white/[0.06] glassmorphism p-6 shadow-[0_0_30px_rgba(0,212,255,0.02)]"
@@ -210,8 +208,7 @@ function App() {
                   </div>
                 </motion.section>
               ) : loading ? (
-                <motion.section
-                  initial={{ opacity: 0 }}
+                <motion.section role="region"                  initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.5 }}
                   className="mt-8"
@@ -219,8 +216,7 @@ function App() {
                   <SkeletonLoader lines={6} />
                 </motion.section>
               ) : (
-                <motion.section
-                  initial={{ opacity: 0 }}
+                <motion.section role="region"                  initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.5 }}
                   className="mt-8"
