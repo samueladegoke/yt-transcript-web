@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Sparkles, Zap, Play } from 'lucide-react';
+import BrandIcon from './BrandIcon';
 
 // Unsplash photos fetched by design orchestrator
 const HERO_PHOTOS = [
@@ -121,12 +122,35 @@ export default function Hero() {
           </div>
         </motion.div>
 
+        {/* Trusted by — real company logos via Brandfetch CDN */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7, duration: 0.5 }}
+          className="mt-8 pt-6 border-t border-white/[0.06]"
+        >
+          <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-slate-500 mb-4">
+            Built with
+          </p>
+          <div className="flex flex-wrap items-center gap-x-8 gap-y-4 opacity-60">
+            {['google', 'github', 'vercel', 'cloudflare', 'supabase', 'openai'].map((brand) => (
+              <motion.div
+                key={brand}
+                whileHover={{ opacity: 1, scale: 1.05 }}
+                transition={{ duration: 0.2 }}
+              >
+                <BrandIcon name={brand} size={20} color="#94a3b8" />
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
         {/* Photo attribution — Unsplash credit (required by license) */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8, duration: 0.5 }}
-          className="mt-6 flex items-center gap-2 text-[11px] text-slate-400/80"
+          className="mt-4 flex items-center gap-2 text-[11px] text-slate-400/80"
         >
           <span>Photo by</span>
           <a href="https://unsplash.com/@neelakshi_singh" target="_blank" rel="noopener noreferrer" className="underline decoration-slate-600/30 hover:text-slate-400 transition-colors">

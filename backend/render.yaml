@@ -9,3 +9,13 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: "3.12"
+      - key: CORS_ORIGINS
+        value: "https://yt-transcript-web.pages.dev,http://localhost:5173,http://localhost:3000,*"
+      - key: YT_PROXY
+        sync: false  # Set in Render dashboard — IPRoyal proxy URL
+      - key: KILO_MODEL
+        sync: false  # Set in Render dashboard
+      - key: KILO_BASE_URL
+        sync: false  # Set in Render dashboard
+      - key: KILO_API_KEY
+        sync: false  # Set in Render dashboard (secret)

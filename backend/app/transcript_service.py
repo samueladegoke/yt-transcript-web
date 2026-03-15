@@ -1,13 +1,14 @@
 """YouTube Transcript Service
 
-Handles fetching transcripts and video info from YouTube.
+Handles fetching transcripts and video info from YouTube via proxy.
+Uses youtube_transcript_api with IPRoyal proxy to bypass YouTube IP blocks.
 """
-import asyncio
-import json
 import os
-from typing import Optional, Dict, Any, List
+from typing import Optional, List
 from dataclasses import dataclass
-import httpx
+
+from youtube_transcript_api import YouTubeTranscriptApi
+from youtube_transcript_api.proxies import GenericProxyConfig
 
 
 @dataclass
@@ -18,37 +19,11 @@ class TranscriptSegment:
     text: str
 
 
-@dataclass
-class VideoInfo:
-    """Basic video information."""
-    video_id: str
-    title: str
-    channel: str
-    duration: str
-    view_count: str
-    upload_date: str
-
-
-class TranscriptServiceError(Exception):
-    """Base exception for transcript service errors."""
-    pass
-
-
-class TranscriptNotFoundError(TranscriptServiceError):
-    """Raised when transcript is not available."""
-    pass
-
-
-class InvalidUrlError(TranscriptServiceError):
-    """Raised when URL is invalid."""
-    pass
-
-
 def extract_video_id(url: str) -> str:
     """Extract video ID from YouTube URL."""
     if not url:
-        raise InvalidUrlError("URL cannot be empty")
-    
+        raise ValueError("URL cannot be empty")
+
     # Handle various YouTube URL formats
     if "youtu.be/" in url:
         return url.split("youtu.be/")[-1].split("?")[0].split("&")[0]
@@ -58,173 +33,76 @@ def extract_video_id(url: str) -> str:
         return url.split("embed/")[-1].split("?")[0].split("&")[0]
     elif "youtube.com/v/" in url:
         return url.split("/v/")[-1].split("?")[0].split("&")[0]
-    
+    elif "youtube.com/shorts/" in url:
+        return url.split("shorts/")[-1].split("?")[0].split("&")[0]
+
     # If it looks like a raw video ID, return it
-    if len(url) in [11, 12] and not url.startswith("http"):
-        return url
-    
-    raise InvalidUrlError(f"Could not extract video ID from: {url}")
+    stripped = url.strip()
+    if len(stripped) in [11, 12] and not stripped.startswith("http"):
+        return stripped
 
-
-# Global proxy configuration
-_proxy_config: Dict[str, Optional[str]] = {
-    "yt_proxy": None,
-    "http_proxy": None,
-    "socks5_proxy": None,
-}
-
-
-def reload_proxy_config():
-    """Reload proxy configuration from environment variables.
-    
-    Priority order for proxy selection:
-    1. YT_PROXY - Specific to YouTube transcript service
-    2. HTTP_PROXY - General HTTP proxy
-    3. SOCKS5_PROXY - SOCKS5 proxy fallback
-    """
-    global _proxy_config
-    # Priority: YT_PROXY > HTTP_PROXY > SOCKS5_PROXY
-    _proxy_config["yt_proxy"] = os.getenv("YT_PROXY")
-    _proxy_config["http_proxy"] = os.getenv("HTTP_PROXY")
-    _proxy_config["socks5_proxy"] = os.getenv("SOCKS5_PROXY")
+    raise ValueError(f"Could not extract video ID from: {url}")
 
 
 def get_proxy_url() -> Optional[str]:
+    """Get proxy URL from YT_PROXY env var (IPRoyal credentials)."""
+    return os.getenv("YT_PROXY")
+
+
+def get_proxy_config() -> Optional[GenericProxyConfig]:
+    """Create GenericProxyConfig from YT_PROXY env var."""
+    proxy_url = get_proxy_url()
+    if not proxy_url:
+        return None
+    return GenericProxyConfig(
+        http_url=proxy_url,
+        https_url=proxy_url,
+    )
+
+
+def get_transcript(url: str, lang: str = "en") -> List[TranscriptSegment]:
     """
-    Get the appropriate proxy URL based on priority.
-    Priority: YT_PROXY > HTTP_PROXY > SOCKS5_PROXY
+    Fetch transcript for a YouTube video using proxy.
+
+    Args:
+        url: YouTube video URL or video ID
+        lang: Language code (default: 'en')
+
+    Returns:
+        List of TranscriptSegment objects
+
+    Raises:
+        ValueError: If URL is invalid or transcript not found
     """
-    # Reload config to get latest env vars
-    reload_proxy_config()
-    
-    # Check in priority order
-    if _proxy_config.get("yt_proxy"):
-        return _proxy_config["yt_proxy"]
-    if _proxy_config.get("http_proxy"):
-        return _proxy_config["http_proxy"]
-    if _proxy_config.get("socks5_proxy"):
-        return _proxy_config["socks5_proxy"]
-    return None
+    video_id = extract_video_id(url)
+    proxy_config = get_proxy_config()
 
-
-# Initialize proxy config on module load
-reload_proxy_config()
-
-
-class TranscriptService:
-    """Service for fetching YouTube transcripts."""
-    
-    def __init__(self, api_key: Optional[str] = None, proxy_url: Optional[str] = None):
-        self.api_key = api_key or os.getenv("YOUTUBE_API_KEY")
-        self.base_url = "https://www.youtube.com"
-        # Use provided proxy or get from environment
-        self.proxy_url = proxy_url or get_proxy_url()
-        self.client = httpx.AsyncClient(
-            timeout=30.0,
-            proxy=self.proxy_url if self.proxy_url else None
-        )
-    
-    async def close(self):
-        """Close the HTTP client."""
-        await self.client.aclose()
-    
-    async def __aenter__(self):
-        return self
-    
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
-        await self.close()
-    
-    async def get_transcript(self, url: str, lang: str = "en") -> List[TranscriptSegment]:
-        """
-        Fetch transcript for a YouTube video.
-        
-        Args:
-            url: YouTube video URL or video ID
-            lang: Language code (default: 'en')
-        
-        Returns:
-            List of TranscriptSegment objects
-        
-        Raises:
-            TranscriptNotFoundError: If transcript is not available
-            InvalidUrlError: If URL is invalid
-        """
-        video_id = extract_video_id(url)
-        
-        # Try to fetch from YouTube directly
-        try:
-            return await self._fetch_transcript_from_youtube(video_id, lang)
-        except TranscriptNotFoundError:
-            # Fall back to alternative method
-            return await self._fetch_transcript_fallback(video_id, lang)
-    
-    async def _fetch_transcript_from_youtube(self, video_id: str, lang: str = "en") -> List[TranscriptSegment]:
-        """Fetch transcript directly from YouTube."""
-        # This is a simplified implementation
-        # In production, you'd use the YouTube API or a transcript library
-        raise TranscriptNotFoundError("Transcript not available via direct fetch")
-    
-    async def _fetch_transcript_fallback(self, video_id: str, lang: str = "en") -> List[TranscriptSegment]:
-        """Fallback method for fetching transcript."""
-        # Simulated transcript for demo purposes
-        # In production, integrate with youtube-transcript-api or similar
-        raise TranscriptNotFoundError(
-            f"Transcript not available for video {video_id}. "
-            "Ensure the video has captions/subtitles enabled."
-        )
-    
-    async def get_video_info(self, url: str) -> VideoInfo:
-        """
-        Get basic video information.
-        
-        Args:
-            url: YouTube video URL or video ID
-        
-        Returns:
-            VideoInfo object
-        """
-        video_id = extract_video_id(url)
-        
-        # Simulated video info for demo
-        # In production, use YouTube Data API
-        return VideoInfo(
-            video_id=video_id,
-            title="Sample Video Title",
-            channel="Sample Channel",
-            duration="10:00",
-            view_count="1000",
-            upload_date="2024-01-01"
-        )
-    
-    async def analyze(self, url: str, analysis_type: str = "summary", lang: str = "en") -> Dict[str, Any]:
-        """
-        Analyze video transcript.
-        
-        Args:
-            url: YouTube video URL or video ID
-            analysis_type: Type of analysis (summary, outline, key_points)
-            lang: Language code
-        
-        Returns:
-            Analysis results as dict
-        """
-        transcript = await self.get_transcript(url, lang)
-        full_text = " ".join([seg.text for seg in transcript])
-        
-        if analysis_type == "summary":
-            return {"summary": full_text[:500] + "..." if len(full_text) > 500 else full_text}
-        elif analysis_type == "outline":
-            return {"outline": ["Introduction", "Main Content", "Conclusion"]}
-        elif analysis_type == "key_points":
-            return {"key_points": ["Point 1", "Point 2", "Point 3"]}
+    try:
+        api = YouTubeTranscriptApi(proxy_config=proxy_config)
+        result = api.fetch(video_id, languages=[lang])
+    except Exception as exc:
+        error_type = type(exc).__name__
+        if "NotFound" in error_type or "NoTranscript" in error_type:
+            raise ValueError(
+                f"No transcript found for video {video_id}. "
+                "The video may not have captions."
+            )
+        elif "Blocked" in error_type or "RequestBlocked" in error_type:
+            raise ValueError(
+                f"YouTube blocked the request for video {video_id}. "
+                "The proxy may be unavailable."
+            )
         else:
-            return {"error": f"Unknown analysis type: {analysis_type}"}
+            raise ValueError(f"Transcript fetch failed: {exc}")
 
+    segments = []
+    for entry in result:
+        segments.append(
+            TranscriptSegment(
+                start=float(entry.start),
+                duration=float(entry.duration),
+                text=entry.text,
+            )
+        )
 
-async def check_environment() -> Dict[str, Any]:
-    """Check if required environment variables are set."""
-    api_key = os.getenv("YOUTUBE_API_KEY")
-    return {
-        "youtube_api_key": "set" if api_key else "not set",
-        "status": "healthy" if api_key else "missing_api_key"
-    }
+    return segments
