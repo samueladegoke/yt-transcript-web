@@ -11,11 +11,11 @@ dependencies = [
     "youtube-transcript-api>=1.2.0",
     "pydantic>=2.0.0",
     "python-dotenv>=1.0.0",
+    "mcp>=1.0.0",
 ]
 
 [project.optional-dependencies]
 proxy = ["yt-dlp>=2024.1.1"]
-mcp = ["mcp>=1.0.0"]
 
 [project.scripts]
 yt-transcript-proxy = "app.mcp_proxy:main"
