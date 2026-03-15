@@ -21,12 +21,19 @@ export default function Hero() {
     >
       {/* Real photo background — Unsplash hero image */}
       <div className="absolute inset-0">
-        <img
-          src={HERO_PHOTO}
-          alt=""
-          loading="lazy"
-          className="absolute inset-0 w-full h-full object-cover opacity-25"
-        />
+        <picture>
+          <source
+            srcSet={`${HERO_PHOTO}&w=2560&q=80 2560w, ${HERO_PHOTO}&w=1920&q=80 1920w, ${HERO_PHOTO}&w=1280&q=80 1280w`}
+            sizes="100vw"
+          />
+          <img
+            src={HERO_PHOTO}
+            alt="Abstract blue bokeh lights — technology concept background by Neelakshi Singh on Unsplash"
+            loading="eager"
+            fetchPriority="high"
+            className="absolute inset-0 w-full h-full object-cover opacity-25"
+          />
+        </picture>
         {/* Dark gradient overlay for text readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#0A1832]/70 via-[#0A1832]/80 to-[#0A1832]/95" />
       </div>
