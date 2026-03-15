@@ -14,3 +14,7 @@ node_modules/
 !.vscode/extensions.json
 .idea
 .DS_Store
+backend/.venv/
+screenshot-*.png
+test-live-site.py
+backend/.venv/

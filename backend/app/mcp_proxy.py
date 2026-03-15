@@ -17,10 +17,11 @@ from mcp.server.fastmcp import FastMCP
 # Initialize MCP server
 mcp = FastMCP("youtube-transcript-proxy")
 
-# Render backend URL
+# Backend URL — defaults to localhost (same VM as MCP server)
+# Override with RENDER_BACKEND_URL env var for remote backends
 RENDER_BACKEND_URL = os.getenv(
     "RENDER_BACKEND_URL",
-    "https://yt-transcript-api-hzk2.onrender.com"
+    "http://localhost:8000"
 )
 
 
