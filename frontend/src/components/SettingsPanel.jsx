@@ -8,6 +8,7 @@ export function SettingsPanel({ settings, onSettingsChange, onClose }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
+      role="dialog" aria-modal="true" aria-labelledby="settings-heading"
       className="fixed inset-0 z-40 flex items-center justify-center bg-black/60 backdrop-blur-sm"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
@@ -23,7 +24,7 @@ export function SettingsPanel({ settings, onSettingsChange, onClose }) {
 
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
-          <h2 className="text-lg font-semibold text-white font-display">Settings</h2>
+          <h2 id="settings-heading" className="text-lg font-semibold text-white font-display">Settings</h2>
           <motion.button
             whileHover={{ scale: 1.1, rotate: 90 }}
             whileTap={{ scale: 0.9 }}
@@ -66,6 +67,7 @@ export function SettingsPanel({ settings, onSettingsChange, onClose }) {
               <Globe className="h-4 w-4 text-[#00D4FF]/60" />
               <select
                 value={settings.language}
+                aria-label="Language selection"
                 onChange={(e) => onSettingsChange({ ...settings, language: e.target.value })}
                 className="flex-1 bg-transparent text-sm text-slate-200 outline-none cursor-pointer"
               >
@@ -107,6 +109,7 @@ function SettingToggle({ icon: Icon, label, description, enabled, onToggle }) {
         </div>
       </div>
       <motion.button
+        role="switch" aria-checked={enabled}
         whileTap={{ scale: 0.95 }}
         onClick={onToggle}
         className={cn(
@@ -120,6 +123,6 @@ function SettingToggle({ icon: Icon, label, description, enabled, onToggle }) {
           className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-md"
         />
       </motion.button>
-    </div.div>
+    </div>
   );
 }

@@ -1,11 +1,11 @@
 import { motion } from 'framer-motion';
 
 export function ProgressBar({ completed, total, duration }) {
-  const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
-  const perSec = duration > 0 ? (completed / duration).toFixed(1) : 0;
+  const percentage = total > 0 ? Math.min(100, Math.max(0, Math.round((completed / total) * 100))) : 0;
+  const perSec = duration > 0 ? Math.max(0, completed / duration).toFixed(1) : 0;
 
   return (
-    <div className="space-y-2.5">
+    <div className="space-y-2.5" role="progressbar" aria-valuenow={percentage} aria-valuemin={0} aria-valuemax={100} aria-label="Proxy check progress">
       <div className="flex justify-between text-sm">
         <span className="text-slate-400">
           Checking proxies... {completed}/{total}

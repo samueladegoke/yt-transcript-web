@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { cn } from '../lib/utils';
 
 const colorMap = {
@@ -37,10 +37,10 @@ export default function StatCard({ label, value, icon: Icon, color = 'gold', cla
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -2, scale: 1.02 }}
-      transition={{ duration: 0.3 }}
+      initial={reduce ? undefined : { opacity: 0, y: 10 }}
+      animate={reduce ? undefined : { opacity: 1, y: 0 }}
+      whileHover={reduce ? undefined : { y: -2, scale: 1.02 }}
+      transition={reduce ? undefined : { duration: 0.3 }}
       className={cn(
         "relative rounded-xl border p-4 backdrop-blur-sm overflow-hidden",
         colors.border,
