@@ -1,6 +1,6 @@
 # YouTube Transcript Web — Project Specification
 
-> **Single Source of Truth** — Last updated: 2026-03-15
+> **Single Source of Truth** — Last updated: 2026-03-15 (21:40 UTC)
 > 
 > **Rule:** This file MUST be updated whenever substantial changes are made to the codebase.
 > **Rule:** Every feature listed here must have a corresponding implementation in the code.
@@ -33,15 +33,17 @@ All endpoints are POST unless otherwise specified. Backend runs on `http://local
 
 ### Analysis Types for `/api/analyze`
 
-| Type | Description | Result Keys |
-|------|-------------|-------------|
-| `summary` | Concise summary | `{summary}` |
-| `outline` | Structured outline | `{outline: [...]}` |
-| `key_points` | Key insights | `{key_points: [...]}` |
-| `action_points` | Actionable items | `{action_points: [...]}` |
-| `next_steps` | Logical next steps | `{next_steps: [...]}` |
-| `structured_edit` | **Professional Edit** — combines all features | `{summary, outline, key_points, next_steps, structured_edit}` |
-| `all` | All analysis types combined | `{summary, outline, key_points, action_points, next_steps}` |
+| Type | Description | Result Format |
+|------|-------------|---------------|
+| `summary` | Concise summary | `{result: "summary text..."}` |
+| `outline` | Structured outline | `{result: "markdown outline..."}` |
+| `key_points` | Key insights | `{result: "markdown key points..."}` |
+| `action_points` | Actionable items | `{result: "markdown action items..."}` |
+| `next_steps` | Logical next steps | `{result: "markdown next steps..."}` |
+| `structured_edit` | **Professional Edit** — combines all features | `{result: "## PROFESSIONAL EDIT TRANSCRIPT\n...\n## SUMMARY\n...\n## ACTION POINTS\n...\n## NEXT STEPS\n..."}` |
+| `all` | All analysis types combined | `{result: "complete markdown analysis..."}` |
+
+> **Note:** All analysis types return raw markdown/text under a `result` key. The `structured_edit` type outputs 4 `##`-headed sections as specified in the original commit `113dfaa`.
 
 ### Request Models
 
@@ -61,6 +63,7 @@ class AnalyzeRequest(BaseModel):
     url: str = Field(..., min_length=5, max_length=500)
     type: str = Field(default="summary", pattern="^(summary|outline|key_points|action_points|next_steps|structured_edit|all)$")
     language: str = Field(default="en", min_length=2, max_length=10)
+    transcript: Optional[str] = Field(default=None, description="Pre-fetched transcript text (skips YouTube fetch)")
 ```
 
 ## 🎨 Frontend Features
@@ -206,6 +209,23 @@ RENDER_BACKEND_URL = os.getenv("RENDER_BACKEND_URL", "http://localhost:8000")
 - yt-dlp not in systemd PATH → added `/usr/local/bin` to PATH
 - KILO model name invalid → corrected to `kilo-auto/free`
 - Frontend API URL wrong → fixed to ngrok HTTPS URL
+
+### 2026-03-15 (21:00 UTC) — Original AI Format Restored + MCP Fix
+**Why:** Commit `113dfaa` had specific system prompts and markdown format for Professional Edit. The restored code used JSON format instead, losing the original structure.
+
+**Backend changes:**
+- `analyze_with_kilo` — restored original system prompts for each analysis type (summary, action_points, next_steps, structured_edit, all)
+- `structured_edit` now uses markdown headers (`## PROFESSIONAL EDIT TRANSCRIPT`, `## SUMMARY`, `## ACTION POINTS`, `## NEXT STEPS`) instead of JSON keys
+- Added `description` and `links` parameters to `analyze_with_kilo` — the AI now sees video context for richer analysis
+- Added `transcript` parameter to `AnalyzeRequest` — frontend sends already-fetched transcript to avoid YouTube re-fetch blocking
+- `/api/analyze` endpoint now fetches description+links from yt-dlp for context
+
+**MCP proxy fix (`mcp_proxy.py`):**
+- `get_transcript` — fixed path: `/transcript` → `/api/extract`
+- `get_video_info` — fixed path: `/video-info` → `/api/video-info`
+- `analyze` — fixed path: `/analyze` → `/api/analyze`
+- `analyze` — added `transcript` parameter, updated analysis types list
+- `get_transcript` — returns timestamped text instead of raw segments
 
 ### 2026-03-14 — Initial Cloudflare Build Fix
 **Why:** JSX fragment issue needed fixing for Cloudflare Pages to build
