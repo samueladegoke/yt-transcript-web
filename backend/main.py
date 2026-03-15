@@ -111,6 +111,11 @@ def analyze_with_kilo(
     }
     system_prompt = system_prompts.get(analysis_type, system_prompts["summary"])
 
+    # Truncate very long transcripts to avoid token limits
+    max_transcript_chars = 12000 if analysis_type in ("structured_edit", "all") else 8000
+    if len(transcript_text) > max_transcript_chars:
+        transcript_text = transcript_text[:max_transcript_chars] + "\n\n[... transcript truncated for length ...]"
+
     # Build context with transcript + optional description + links
     context_parts = [f"Transcript:\n{transcript_text}"]
     if description:
@@ -162,8 +167,9 @@ Please provide a complete analysis with:
 
 Format using clear Markdown headers (##)."""
 
-    # Call KILO API
+    # Call KILO API (higher tokens for comprehensive analyses)
     api_url = f"{config['base_url'].rstrip('/')}/chat/completions"
+    max_tokens = 4000 if analysis_type in ("structured_edit", "all") else 2000
     payload = {
         "model": config["model"],
         "messages": [
@@ -171,7 +177,7 @@ Format using clear Markdown headers (##)."""
             {"role": "user", "content": user_prompt},
         ],
         "temperature": 0.3,
-        "max_tokens": 2000,
+        "max_tokens": max_tokens,
     }
 
     req = urllib.request.Request(
