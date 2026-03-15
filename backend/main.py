@@ -81,97 +81,102 @@ def get_kilo_config() -> dict:
     }
 
 
-def analyze_with_kilo(transcript_text: str, analysis_type: str = "summary") -> dict:
+def analyze_with_kilo(
+    transcript_text: str,
+    analysis_type: str = "summary",
+    description: str = None,
+    links: list = None,
+) -> dict:
     """
     Analyze transcript text using KILO API (OpenAI-compatible).
-    
-    Args:
-        transcript_text: Full transcript text
-        analysis_type: summary | outline | key_points
-    
-    Returns:
-        dict with analysis results
+
+    Original format restored from commit 113dfaa.
+    Returns raw markdown text, not structured JSON.
     """
     import urllib.request
-    import json as _json
 
     config = get_kilo_config()
     if not config["base_url"] or not config["api_key"]:
         raise ValueError("KILO_BASE_URL and KILO_API_KEY must be set in environment")
 
-    # Build the prompt based on analysis type
-    prompts = {
-        "summary": (
-            "Provide a concise, professional summary of this YouTube video transcript. "
-            "Focus on the main topic, key arguments, and conclusion. "
-            "Write 2-4 sentences. Be specific, not generic.\n\n"
-            f"Transcript:\n{transcript_text[:8000]}"
-        ),
-        "outline": (
-            "Create a structured outline of this YouTube video transcript. "
-            "Identify the main sections, topics discussed, and their order. "
-            "Return as a JSON list of strings.\n\n"
-            f"Transcript:\n{transcript_text[:8000]}\n\n"
-            'Return ONLY valid JSON: {"outline": ["section 1", "section 2", ...]}'
-        ),
-        "key_points": (
-            "Extract the key points and insights from this YouTube video transcript. "
-            "Focus on actionable information, main arguments, and notable quotes. "
-            "Return as a JSON list.\n\n"
-            f"Transcript:\n{transcript_text[:8000]}\n\n"
-            'Return ONLY valid JSON: {"key_points": ["point 1", "point 2", ...]}'
-        ),
-        "action_points": (
-            "Extract all actionable items, tasks, and recommendations from this YouTube video transcript. "
-            "Return as a JSON list of actionable points.\n\n"
-            f"Transcript:\n{transcript_text[:8000]}\n\n"
-            'Return ONLY valid JSON: {"action_points": ["action 1", "action 2", ...]}'
-        ),
-        "next_steps": (
-            "Based on this YouTube video transcript, identify the logical next steps the viewer should take. "
-            "Return as a numbered list.\n\n"
-            f"Transcript:\n{transcript_text[:8000]}\n\n"
-            'Return ONLY valid JSON: {"next_steps": ["step 1", "step 2", ...]}'
-        ),
-        "structured_edit": (
-            "You are a professional video transcript editor. Produce a COMPREHENSIVE analysis that includes:\n"
-            "1. A concise summary (2-4 sentences)\n"
-            "2. A structured outline with timestamps\n"
-            "3. Key points and insights\n"
-            "4. Actionable next steps\n"
-            "5. A professionally edited transcript with improved readability, punctuation, and paragraph breaks\n\n"
-            f"Transcript:\n{transcript_text[:12000]}\n\n"
-            'Return ONLY valid JSON: {"summary": "...", "outline": ["section 1", ...], "key_points": ["...", ...], "next_steps": ["...", ...], "structured_edit": "professionally edited transcript here..."}'
-        ),
-        "all": (
-            "Perform a COMPLETE analysis of this YouTube video transcript. Include ALL of the following:\n"
-            "- Summary\n"
-            "- Outline\n"
-            "- Key Points\n"
-            "- Action Points\n"
-            "- Next Steps\n\n"
-            f"Transcript:\n{transcript_text[:10000]}\n\n"
-            'Return ONLY valid JSON: {"summary": "...", "outline": [...], "key_points": [...], "action_points": [...], "next_steps": [...]}'
-        ),
+    # System prompts from original code (commit 113dfaa)
+    system_prompts = {
+        "summary": "You are a helpful assistant that creates concise summaries of video transcripts.",
+        "action_points": "You are a helpful assistant that extracts actionable points from video transcripts.",
+        "next_steps": "You are a helpful assistant that suggests next steps based on video transcripts.",
+        "structured_edit": "You are a professional editor. Your task is to structure the transcript into a coherent document with proper paragraphs and punctuation, ensuring no words or letters are lost from the original text.",
+        "outline": "You are a helpful assistant that creates structured outlines of video transcripts.",
+        "key_points": "You are a helpful assistant that extracts key points and insights from video transcripts.",
+        "all": "You are a helpful assistant that provides summary, action points, and next steps from video transcripts.",
     }
+    system_prompt = system_prompts.get(analysis_type, system_prompts["summary"])
 
-    prompt = prompts.get(analysis_type, prompts["summary"])
+    # Build context with transcript + optional description + links
+    context_parts = [f"Transcript:\n{transcript_text}"]
+    if description:
+        context_parts.append(f"\nVideo Description:\n{description}")
+    if links:
+        context_parts.append("\nLinks from description:\n" + "\n".join(f"- {link}" for link in links))
+    context = "\n".join(context_parts)
 
-    # Call KILO API (OpenAI-compatible)
+    # Build user prompt based on analysis type (original format)
+    if analysis_type == "summary":
+        user_prompt = f"{context}\n\nPlease provide a concise summary of this video content (2-4 paragraphs)."
+    elif analysis_type == "action_points":
+        user_prompt = f"{context}\n\nPlease extract the key actionable points from this video. Format as a bulleted list."
+    elif analysis_type == "next_steps":
+        user_prompt = f"{context}\n\nBased on this video content, what are the recommended next steps? Format as a numbered list."
+    elif analysis_type == "structured_edit":
+        user_prompt = f"""{context}
+
+You are a Professional Editor. Please process the provided transcript into a comprehensive, master-level document optimized for AI Agent consumption.
+
+Follow these specific tasks and formatting rules:
+
+1. PROFESSIONAL EDIT TRANSCRIPT: Re-structure the verbatim transcript into logical paragraphs with correct punctuation and capitalization. DO NOT lose or change any words, phrases, or letters from the original text.
+2. SUMMARY: Provide a concise 2-4 paragraph summary of the content.
+3. ACTION POINTS: Extract the key actionable points as a bulleted list.
+4. NEXT STEPS: Provide recommended next steps based on the content as a numbered list.
+
+Format the output using clear Markdown headers (##):
+
+## PROFESSIONAL EDIT TRANSCRIPT
+[Your verbatim restructured transcript here]
+
+## SUMMARY
+[Your summary here]
+
+## ACTION POINTS
+[Your action points here]
+
+## NEXT STEPS
+[Your next steps here]"""
+    else:  # "all"
+        user_prompt = f"""{context}
+
+Please provide a complete analysis with:
+1. A concise summary (2-4 paragraphs)
+2. Key points and insights
+3. Actionable points as a bulleted list
+4. Recommended next steps as a numbered list
+
+Format using clear Markdown headers (##)."""
+
+    # Call KILO API
     api_url = f"{config['base_url'].rstrip('/')}/chat/completions"
-    payload = _json.dumps({
+    payload = {
         "model": config["model"],
         "messages": [
-            {"role": "system", "content": "You are a precise video transcript analyst. Be concise and specific."},
-            {"role": "user", "content": prompt},
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
         ],
         "temperature": 0.3,
-        "max_tokens": 1000,
-    }).encode("utf-8")
+        "max_tokens": 2000,
+    }
 
     req = urllib.request.Request(
         api_url,
-        data=payload,
+        data=__import__("json").dumps(payload).encode("utf-8"),
         headers={
             "Content-Type": "application/json",
             "Authorization": f"Bearer {config['api_key']}",
@@ -180,8 +185,8 @@ def analyze_with_kilo(transcript_text: str, analysis_type: str = "summary") -> d
     )
 
     try:
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            data = _json.loads(resp.read().decode("utf-8"))
+        with urllib.request.urlopen(req, timeout=120) as resp:
+            data = __import__("json").loads(resp.read().decode("utf-8"))
     except Exception as exc:
         raise ValueError(f"KILO API call failed: {exc}")
 
@@ -189,42 +194,8 @@ def analyze_with_kilo(transcript_text: str, analysis_type: str = "summary") -> d
     if not content:
         raise ValueError("KILO API returned empty response")
 
-    # For summary, return plain text
-    if analysis_type == "summary":
-        return {"summary": content.strip()}
-
-    # For structured_edit, return the full edit
-    if analysis_type == "structured_edit":
-        try:
-            parsed = _json.loads(content.strip())
-            return parsed
-        except _json.JSONDecodeError:
-            import re
-            json_match = re.search(r"```(?:json)?\s*([\s\S]*?)```", content)
-            if json_match:
-                try:
-                    return _json.loads(json_match.group(1).strip())
-                except _json.JSONDecodeError:
-                    pass
-            return {"structured_edit": content.strip()}
-
-    # For all types, try to parse JSON
-    try:
-        parsed = _json.loads(content.strip())
-        return parsed
-    except _json.JSONDecodeError:
-        import re
-        json_match = re.search(r"```(?:json)?\s*([\s\S]*?)```", content)
-        if json_match:
-            try:
-                return _json.loads(json_match.group(1).strip())
-            except _json.JSONDecodeError:
-                pass
-        # Fallback: return as text list split by newlines
-        lines = [l.strip("- •\t ") for l in content.strip().split("\n") if l.strip()]
-        key_map = {"outline": "outline", "key_points": "key_points", "action_points": "action_points", "next_steps": "next_steps"}
-        key = key_map.get(analysis_type, "result")
-        return {key: lines}
+    # Return raw text under "result" key (original format)
+    return {"result": content.strip()}
 
 
 def get_video_title(video_id: str) -> str:
@@ -371,13 +342,19 @@ async def analyze_transcript_endpoint(request: AnalyzeRequest):
         except ValueError as exc:
             raise HTTPException(status_code=404, detail=str(exc))
 
-    # Then analyze with KILO
+    # Get video metadata (description + links) for richer AI context
+    import re as _re
+    video_info = await asyncio.to_thread(get_video_info_from_ytdlp, video_id)
+    description = video_info.get("description", "")
+    link_pattern = _re.compile(r'https?://[^\s\)\]>]+')
+    links = link_pattern.findall(description) if description else []
+    title = video_info.get("title", await asyncio.to_thread(get_video_title, video_id))
+
+    # Then analyze with KILO (pass description + links for context)
     try:
-        analysis = analyze_with_kilo(transcript_text, request.type)
+        analysis = analyze_with_kilo(transcript_text, request.type, description=description, links=links)
     except ValueError as exc:
         raise HTTPException(status_code=502, detail=str(exc))
-
-    title = await asyncio.to_thread(get_video_title, video_id)
 
     return AnalyzeResponse(
         success=True,
