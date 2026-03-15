@@ -65,6 +65,115 @@ def seconds_to_timestamp(seconds: float) -> str:
     return f"{minutes:02d}:{secs:02d}"
 
 
+def get_kilo_config() -> dict:
+    """Get KILO API configuration from env vars."""
+    return {
+        "model": os.getenv("KILO_MODEL", "kilo-model"),
+        "base_url": os.getenv("KILO_BASE_URL"),
+        "api_key": os.getenv("KILO_API_KEY"),
+    }
+
+
+def analyze_with_kilo(transcript_text: str, analysis_type: str = "summary") -> dict:
+    """
+    Analyze transcript text using KILO API (OpenAI-compatible).
+    
+    Args:
+        transcript_text: Full transcript text
+        analysis_type: summary | outline | key_points
+    
+    Returns:
+        dict with analysis results
+    """
+    import urllib.request
+    import json as _json
+
+    config = get_kilo_config()
+    if not config["base_url"] or not config["api_key"]:
+        raise ValueError("KILO_BASE_URL and KILO_API_KEY must be set in environment")
+
+    # Build the prompt based on analysis type
+    prompts = {
+        "summary": (
+            "Provide a concise, professional summary of this YouTube video transcript. "
+            "Focus on the main topic, key arguments, and conclusion. "
+            "Write 2-4 sentences. Be specific, not generic.\n\n"
+            f"Transcript:\n{transcript_text[:8000]}"
+        ),
+        "outline": (
+            "Create a structured outline of this YouTube video transcript. "
+            "Identify the main sections, topics discussed, and their order. "
+            "Return as a JSON list of strings.\n\n"
+            f"Transcript:\n{transcript_text[:8000]}\n\n"
+            'Return ONLY valid JSON: {"outline": ["section 1", "section 2", ...]}'
+        ),
+        "key_points": (
+            "Extract the key points and insights from this YouTube video transcript. "
+            "Focus on actionable information, main arguments, and notable quotes. "
+            "Return as a JSON list.\n\n"
+            f"Transcript:\n{transcript_text[:8000]}\n\n"
+            'Return ONLY valid JSON: {"key_points": ["point 1", "point 2", ...]}'
+        ),
+    }
+
+    prompt = prompts.get(analysis_type, prompts["summary"])
+
+    # Call KILO API (OpenAI-compatible)
+    api_url = f"{config['base_url'].rstrip('/')}/chat/completions"
+    payload = _json.dumps({
+        "model": config["model"],
+        "messages": [
+            {"role": "system", "content": "You are a precise video transcript analyst. Be concise and specific."},
+            {"role": "user", "content": prompt},
+        ],
+        "temperature": 0.3,
+        "max_tokens": 1000,
+    }).encode("utf-8")
+
+    req = urllib.request.Request(
+        api_url,
+        data=payload,
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {config['api_key']}",
+        },
+        method="POST",
+    )
+
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            data = _json.loads(resp.read().decode("utf-8"))
+    except Exception as exc:
+        raise ValueError(f"KILO API call failed: {exc}")
+
+    content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+    if not content:
+        raise ValueError("KILO API returned empty response")
+
+    # For summary, return plain text
+    if analysis_type == "summary":
+        return {"summary": content.strip()}
+
+    # For outline/key_points, try to parse JSON from response
+    try:
+        # Try direct JSON parse
+        parsed = _json.loads(content.strip())
+        return parsed
+    except _json.JSONDecodeError:
+        # Try to extract JSON from markdown code block
+        import re
+        json_match = re.search(r"```(?:json)?\s*([\s\S]*?)```", content)
+        if json_match:
+            try:
+                return _json.loads(json_match.group(1).strip())
+            except _json.JSONDecodeError:
+                pass
+        # Fallback: return as text list split by newlines
+        lines = [l.strip("- •\t ") for l in content.strip().split("\n") if l.strip()]
+        key = "outline" if analysis_type == "outline" else "key_points"
+        return {key: lines}
+
+
 def get_video_title(video_id: str) -> str:
     """Get video title — best effort, no API key required."""
     try:
@@ -124,13 +233,67 @@ def read_root():
     }
 
 
+class AnalyzeRequest(BaseModel):
+    url: str = Field(..., min_length=5, max_length=500)
+    type: str = Field(default="summary", pattern="^(summary|outline|key_points)$")
+    language: str = Field(default="en", min_length=2, max_length=10)
+
+
+class AnalyzeResponse(BaseModel):
+    success: bool
+    video_id: str
+    title: str
+    analysis_type: str
+    result: dict
+    generated_at: float
+
+
+@app.post("/api/analyze", response_model=AnalyzeResponse)
+async def analyze_transcript_endpoint(request: AnalyzeRequest):
+    """Analyze a YouTube video transcript using KILO AI."""
+    try:
+        video_id = extract_video_id(request.url)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+    language = request.language.strip().lower() if request.language else "en"
+
+    # First, get the transcript
+    try:
+        segments = get_transcript(request.url, lang=language)
+        transcript_text = "\n".join(
+            f"[{seconds_to_timestamp(s.start)}] {s.text}" for s in segments
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+
+    # Then analyze with KILO
+    try:
+        analysis = analyze_with_kilo(transcript_text, request.type)
+    except ValueError as exc:
+        raise HTTPException(status_code=502, detail=str(exc))
+
+    title = await asyncio.to_thread(get_video_title, video_id)
+
+    return AnalyzeResponse(
+        success=True,
+        video_id=video_id,
+        title=title,
+        analysis_type=request.type,
+        result=analysis,
+        generated_at=time.time(),
+    )
+
+
 @app.get("/health")
 def health_check():
+    kilo_status = "configured" if os.getenv("KILO_API_KEY") else "missing"
     proxy_status = "configured" if get_proxy_url() else "missing"
     return {
         "status": "healthy",
         "service": "youtube-transcript-api",
         "proxy": proxy_status,
+        "kilo": kilo_status,
     }
 
 
