@@ -5,7 +5,7 @@ import logging
 import os
 import re
 import time
-from typing import List
+from typing import Dict, List, Optional
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
@@ -337,6 +337,7 @@ class AnalyzeRequest(BaseModel):
     url: str = Field(..., min_length=5, max_length=500)
     type: str = Field(default="summary", pattern="^(summary|outline|key_points|action_points|next_steps|structured_edit|all)$")
     language: str = Field(default="en", min_length=2, max_length=10)
+    transcript: Optional[str] = Field(default=None, description="Pre-fetched transcript text (skips YouTube fetch)")
 
 
 class AnalyzeResponse(BaseModel):
@@ -358,14 +359,17 @@ async def analyze_transcript_endpoint(request: AnalyzeRequest):
 
     language = request.language.strip().lower() if request.language else "en"
 
-    # First, get the transcript
-    try:
-        segments = get_transcript(request.url, lang=language)
-        transcript_text = "\n".join(
-            f"[{seconds_to_timestamp(s.start)}] {s.text}" for s in segments
-        )
-    except ValueError as exc:
-        raise HTTPException(status_code=404, detail=str(exc))
+    # Use provided transcript or fetch from YouTube
+    if request.transcript:
+        transcript_text = request.transcript
+    else:
+        try:
+            segments = get_transcript(request.url, lang=language)
+            transcript_text = "\n".join(
+                f"[{seconds_to_timestamp(s.start)}] {s.text}" for s in segments
+            )
+        except ValueError as exc:
+            raise HTTPException(status_code=404, detail=str(exc))
 
     # Then analyze with KILO
     try:

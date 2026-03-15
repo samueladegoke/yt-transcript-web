@@ -244,7 +244,7 @@ function DownloadOptions({ data, url }) {
       const response = await fetch(`${API_BASE_URL}/api/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: url, type: analysisType }),
+        body: JSON.stringify({ url: url, type: analysisType, transcript: plainTextWithTimestamps }),
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.detail || 'Analysis failed');
