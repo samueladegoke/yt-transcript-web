@@ -34,88 +34,85 @@ def _get_client() -> httpx.AsyncClient:
 async def get_transcript(url: str, lang: str = "en") -> str:
     """
     Get transcript for a YouTube video.
-    
+
     Args:
         url: YouTube video URL or video ID
         lang: Language code (default: 'en')
-    
+
     Returns:
-        Full transcript text
+        Full transcript text with timestamps
     """
     async with _get_client() as client:
         response = await client.post(
-            f"{RENDER_BACKEND_URL}/transcript",
-            json={"url": url, "lang": lang}
+            f"{RENDER_BACKEND_URL}/api/extract",
+            json={"url": url, "language": lang}
         )
         response.raise_for_status()
         data = response.json()
-        
-        if "error" in data:
-            raise Exception(data["error"])
-        
-        # Return formatted transcript
-        segments = data.get("segments", [])
-        return "\n".join([seg.get("text", "") for seg in segments])
+
+        if not data.get("success"):
+            raise Exception(data.get("error", "Failed to extract transcript"))
+
+        # Return formatted transcript with timestamps
+        lines = data.get("transcript_lines", [])
+        return "\n".join([f"[{l.get('timestamp', '')}] {l.get('text', '')}" for l in lines])
 
 
 @mcp.tool()
 async def get_video_info(url: str) -> Dict[str, Any]:
     """
-    Get information about a YouTube video.
-    
+    Get full video information including description and links.
+
     Args:
         url: YouTube video URL or video ID
-    
+
     Returns:
-        Video information as dict with keys:
-        - video_id
-        - title
-        - channel
-        - duration
-        - view_count
-        - upload_date
+        Video information including title, channel, duration, description, links, and transcript
     """
     async with _get_client() as client:
         response = await client.post(
-            f"{RENDER_BACKEND_URL}/video-info",
+            f"{RENDER_BACKEND_URL}/api/video-info",
             json={"url": url}
         )
         response.raise_for_status()
         data = response.json()
-        
-        if "error" in data:
-            raise Exception(data["error"])
-        
+
+        if not data.get("success"):
+            raise Exception(data.get("error", "Failed to get video info"))
+
         return data
 
 
 @mcp.tool()
-async def analyze(url: str, type: str = "summary") -> Dict[str, Any]:
+async def analyze(url: str, type: str = "summary", transcript: str = None) -> Dict[str, Any]:
     """
-    Analyze a YouTube video transcript.
-    
+    Analyze a YouTube video transcript using AI.
+
     Args:
         url: YouTube video URL or video ID
-        type: Type of analysis (summary, outline, key_points)
-    
+        type: Analysis type — summary, action_points, next_steps, structured_edit, all
+        transcript: Optional pre-fetched transcript text (skips YouTube fetch)
+
     Returns:
-        Analysis results based on type:
-        - summary: {summary: str}
-        - outline: {outline: List[str]}
-        - key_points: {key_points: List[str]}
+        Analysis results — for structured_edit, returns markdown with:
+        ## PROFESSIONAL EDIT TRANSCRIPT, ## SUMMARY, ## ACTION POINTS, ## NEXT STEPS
     """
+    payload: Dict[str, Any] = {"url": url, "type": type}
+    if transcript:
+        payload["transcript"] = transcript
+
     async with _get_client() as client:
         response = await client.post(
-            f"{RENDER_BACKEND_URL}/analyze",
-            json={"url": url, "type": type}
+            f"{RENDER_BACKEND_URL}/api/analyze",
+            json=payload
         )
         response.raise_for_status()
         data = response.json()
-        
-        if "error" in data:
-            raise Exception(data["error"])
-        
-        return data
+
+        if not data.get("success"):
+            raise Exception(data.get("error", "Analysis failed"))
+
+        return data.get("result", data)
 
 
 @mcp.tool()
