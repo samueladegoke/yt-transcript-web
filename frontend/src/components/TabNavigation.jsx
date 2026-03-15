@@ -12,7 +12,7 @@ export default function TabNavigation({ activeTab, onTabChange, children }) {
   return (
     <div className="space-y-6">
       {/* Tab Bar — glassmorphism with brand active indicator */}
-      <nav aria-label="Main navigation"><div className="relative rounded-2xl border border-white/[0.06] glassmorphism p-1.5 flex gap-1">
+      <nav aria-label="Main navigation" className="relative rounded-2xl border border-white/[0.06] glassmorphism p-1.5 flex gap-1">
         {tabs.map((tab) => {
           const isActive = tab.id === activeTab;
           return (
@@ -42,7 +42,7 @@ export default function TabNavigation({ activeTab, onTabChange, children }) {
             </motion.button>
           );
         })}
-      </div>
+      </nav>
 
       {/* Content */}
       <motion.div
