@@ -11,7 +11,7 @@ export default function EmptyState() {
       <div className="absolute inset-0 overflow-hidden">
         <img
           src={EMPTY_PHOTO}
-          alt=""
+          alt="Red play button on dark background — YouTube concept by Shubham Dhage on Unsplash"
           loading="lazy"
           className="absolute inset-0 w-full h-full object-cover opacity-[0.07]"
         />

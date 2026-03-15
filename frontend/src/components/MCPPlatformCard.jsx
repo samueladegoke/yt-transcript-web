@@ -27,7 +27,11 @@ export default function MCPPlatformCard({ name, description, icon, configBlocks 
           whileHover={{ rotate: 5, scale: 1.1 }}
           className={`flex h-12 w-12 items-center justify-center rounded-xl ${colors.iconBg}`}
         >
-          <span className="text-2xl">{icon || '⚙️'}</span>
+          {typeof icon === 'string' && icon.length <= 4 ? (
+            <span className="text-2xl">{icon}</span>
+          ) : (
+            <img src={icon} alt={name} className="w-6 h-6 opacity-80" loading="lazy" />
+          )}
         </motion.div>
         <div>
           <h3 className="text-lg font-semibold text-slate-100">{name}</h3>

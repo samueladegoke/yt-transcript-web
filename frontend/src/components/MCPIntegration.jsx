@@ -3,6 +3,7 @@ import { Terminal, Zap, BookOpen, Plug, Sparkles } from 'lucide-react';
 import MCPPlatformCard from './MCPPlatformCard';
 
 const REPO_URL = 'https://github.com/samueladegoke/yt-transcript-web';
+const SI = 'https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons';
 
 const mcpConfig = JSON.stringify({
   mcpServers: {
@@ -14,11 +15,11 @@ const mcpConfig = JSON.stringify({
 }, null, 2);
 
 const platforms = [
-  { name: 'Claude Desktop', description: "Anthropic's desktop AI assistant", icon: '🤖', configBlocks: [{ title: 'Add to claude_desktop_config.json', config: mcpConfig }] },
-  { name: 'Cursor', description: 'AI-powered code editor', icon: '✏️', configBlocks: [{ title: 'Add to .cursor/mcp.json or ~/.cursor/mcp.json', config: mcpConfig }] },
-  { name: 'VS Code (Copilot)', description: 'GitHub Copilot with MCP support', icon: '💻', configBlocks: [{ title: 'Add to .vscode/mcp.json or settings.json', config: mcpConfig }] },
-  { name: 'Windsurf', description: "Codeium's AI IDE", icon: '🏄', configBlocks: [{ title: 'Add to Windsurf MCP config', config: mcpConfig }] },
-  { name: 'Cline', description: 'Autonomous AI coding agent', icon: '🦾', configBlocks: [{ title: 'Add to Cline MCP settings', config: mcpConfig }] },
+  { name: 'Claude Desktop', description: "Anthropic's desktop AI assistant", icon: `${SI}/anthropic.svg`, configBlocks: [{ title: 'Add to claude_desktop_config.json', config: mcpConfig }] },
+  { name: 'Cursor', description: 'AI-powered code editor', icon: `${SI}/cursor.svg`, configBlocks: [{ title: 'Add to .cursor/mcp.json or ~/.cursor/mcp.json', config: mcpConfig }] },
+  { name: 'VS Code (Copilot)', description: 'GitHub Copilot with MCP support', icon: `${SI}/visualstudiocode.svg`, configBlocks: [{ title: 'Add to .vscode/mcp.json or settings.json', config: mcpConfig }] },
+  { name: 'Windsurf', description: "Codeium's AI IDE", icon: `${SI}/windsurf.svg`, configBlocks: [{ title: 'Add to Windsurf MCP config', config: mcpConfig }] },
+  { name: 'Cline', description: 'Autonomous AI coding agent', icon: `${SI}/cline.svg`, configBlocks: [{ title: 'Add to Cline MCP settings', config: mcpConfig }] },
   { name: 'OpenClaw', description: 'Personal AI agent platform', icon: '🐱', configBlocks: [{ title: 'Add to openclaw.json (mcpServers)', config: mcpConfig }] },
   { name: 'Generic MCP Host', description: 'Any MCP-compatible client', icon: '🔌', configBlocks: [
     { title: 'uvx (no install)', config: `uvx --from git+${REPO_URL}.git#subdirectory=backend yt-transcript-proxy`, language: 'bash' },
@@ -46,7 +47,7 @@ export default function MCPIntegration() {
         {/* Real photo background — developer workspace */}
         <img
           src="https://images.unsplash.com/photo-1753715613382-dc3e8456dbc9?w=1200&q=80&fit=max"
-          alt=""
+          alt="Developer working on dual monitors with code — MCP integration concept"
           loading="lazy"
           className="absolute inset-0 w-full h-full object-cover opacity-10"
         />
