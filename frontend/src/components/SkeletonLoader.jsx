@@ -1,36 +1,61 @@
 import { motion } from 'framer-motion';
 
-export default function SkeletonLoader({ lines = 5 }) {
+export default function SkeletonLoader({ lines = 6 }) {
   return (
-    <div className="h-[56vh] overflow-y-auto rounded-xl border border-white/[0.04] bg-[#0A1832]/40 backdrop-blur-sm p-3 custom-scrollbar">
-      <ul className="space-y-1.5">
-        {Array.from({ length: lines }).map((_, index) => (
-          <motion.li
-            key={index}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: index * 0.08, duration: 0.3 }}
-            className="grid grid-cols-[auto_1fr] gap-3 rounded-lg bg-[#0A1832] px-4 py-3"
-          >
-            {/* Timestamp skeleton - pill shape */}
-            <div className="flex items-center">
-              <div className="h-6 w-20 rounded-full skeleton-shimmer" />
-            </div>
+    <div className="space-y-4">
+      {/* Title skeleton */}
+      <div className="flex items-center justify-between">
+        <div className="h-7 w-64 rounded-lg bg-white/[0.04] overflow-hidden relative">
+          <div className="absolute inset-0 animate-shimmer" />
+        </div>
+        <div className="h-9 w-24 rounded-lg bg-white/[0.04] overflow-hidden relative">
+          <div className="absolute inset-0 animate-shimmer" />
+        </div>
+      </div>
 
-            {/* Text skeleton lines */}
-            <div className="space-y-2.5 py-0.5">
-              <div
-                className="h-4 rounded skeleton-shimmer"
-                style={{ width: `${60 + (index * 7) % 30}%` }}
-              />
-              <div
-                className="h-4 rounded skeleton-shimmer"
-                style={{ width: `${30 + (index * 11) % 40}%`, animationDelay: '0.2s' }}
-              />
-            </div>
-          </motion.li>
-        ))}
-      </ul>
+      {/* Metadata skeleton */}
+      <div className="h-4 w-80 rounded bg-white/[0.03]" />
+
+      <div className="border-t border-white/[0.06] pt-5">
+        {/* Line skeletons with staggered animation */}
+        <div className="space-y-3">
+          {Array.from({ length: lines }).map((_, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.06 }}
+              className="flex gap-4"
+            >
+              {/* Timestamp skeleton — gold tint */}
+              <div className="relative w-16 h-5 rounded bg-[#C8A941]/[0.06] overflow-hidden flex-shrink-0">
+                <div className="absolute inset-0 animate-shimmer" />
+              </div>
+              {/* Text skeleton — varying widths for natural feel */}
+              <div className={`relative h-5 rounded bg-white/[0.04] overflow-hidden flex-1 max-w-${[72, 96, 80, 64, 88, 72][i % 6]}-xs`}>
+                <div className="absolute inset-0 animate-shimmer" style={{ animationDelay: `${i * 0.1}s` }} />
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Bottom shimmer bar — loading progress feel */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="mt-6 flex items-center gap-3"
+        >
+          <div className="h-1 flex-1 rounded-full bg-white/[0.04] overflow-hidden">
+            <motion.div
+              animate={{ x: ['-100%', '200%'] }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+              className="h-full w-1/3 rounded-full bg-gradient-to-r from-transparent via-[#00D4FF]/30 to-transparent"
+            />
+          </div>
+          <span className="text-xs text-slate-500 animate-pulse">Extracting transcript...</span>
+        </motion.div>
+      </div>
     </div>
   );
 }

@@ -1,24 +1,38 @@
+import { motion } from 'framer-motion';
+
 export function RiskBadge({ clean, failed }) {
-    if (failed) {
-        return (
-            <div className="flex items-center gap-2 px-3 py-1 bg-destructive/10 rounded-full w-fit">
-                <span className="w-1.5 h-1.5 rounded-full bg-destructive shadow-[0_0_8px_rgba(250,85,56,0.6)]"></span>
-                <span className="text-[10px] font-bold text-destructive uppercase tracking-widest">Failed</span>
-            </div>
-        );
-    }
-    if (clean) {
-        return (
-            <div className="flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full w-fit">
-                <span className="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(31,249,118,0.6)]"></span>
-                <span className="text-[10px] font-bold text-primary uppercase tracking-widest">Clean</span>
-            </div>
-        );
-    }
+  if (failed) {
     return (
-        <div className="flex items-center gap-2 px-3 py-1 bg-info/10 rounded-full w-fit">
-            <span className="w-1.5 h-1.5 rounded-full bg-info shadow-[0_0_8px_rgba(0,240,255,0.6)]"></span>
-            <span className="text-[10px] font-bold text-info uppercase tracking-widest">Risky</span>
-        </div>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20"
+      >
+        <span className="w-1.5 h-1.5 rounded-full bg-red-400 shadow-[0_0_8px_rgba(250,85,56,0.6)] animate-pulse" />
+        <span className="text-[10px] font-bold text-red-400 uppercase tracking-widest">Failed</span>
+      </motion.div>
     );
+  }
+  if (clean) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C8A941]/10 border border-[#C8A941]/20"
+      >
+        <span className="w-1.5 h-1.5 rounded-full bg-[#E8C85A] shadow-[0_0_8px_rgba(200,169,65,0.6)]" />
+        <span className="text-[10px] font-bold text-[#E8C85A] uppercase tracking-widest">Clean</span>
+      </motion.div>
+    );
+  }
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#00D4FF]/10 border border-[#00D4FF]/20"
+    >
+      <span className="w-1.5 h-1.5 rounded-full bg-[#7AE8FF] shadow-[0_0_8px_rgba(0,212,255,0.6)] animate-pulse" />
+      <span className="text-[10px] font-bold text-[#7AE8FF] uppercase tracking-widest">Risky</span>
+    </motion.div>
+  );
 }

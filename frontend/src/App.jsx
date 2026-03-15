@@ -97,7 +97,7 @@ function App() {
   }, [result]);
 
   return (
-    <motion.main
+    <motion.main role="main"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
@@ -110,7 +110,7 @@ function App() {
           {activeTab === 'transcript' ? (
             <>
               {/* Input Section — glassmorphism card with neon glow */}
-              <motion.section
+              <motion.section role="region"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.5 }}
@@ -167,7 +167,7 @@ function App() {
 
               {/* Results Section */}
               {result ? (
-                <motion.section
+                <motion.section role="region"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5 }}
@@ -210,7 +210,7 @@ function App() {
                   </div>
                 </motion.section>
               ) : loading ? (
-                <motion.section
+                <motion.section role="region"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.5 }}
@@ -219,7 +219,7 @@ function App() {
                   <SkeletonLoader lines={6} />
                 </motion.section>
               ) : (
-                <motion.section
+                <motion.section role="region"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.5 }}
