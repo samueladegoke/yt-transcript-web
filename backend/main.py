@@ -32,9 +32,16 @@ CORS_ORIGINS = os.getenv(
 ).split(",")
 
 
+import json
+import subprocess
+
 class ExtractRequest(BaseModel):
     url: str = Field(..., min_length=5, max_length=500)
     language: str = Field(default="en", min_length=2, max_length=10)
+
+
+class VideoInfoRequest(BaseModel):
+    url: str = Field(..., min_length=5, max_length=500)
 
 
 class TranscriptLine(BaseModel):
@@ -114,6 +121,38 @@ def analyze_with_kilo(transcript_text: str, analysis_type: str = "summary") -> d
             f"Transcript:\n{transcript_text[:8000]}\n\n"
             'Return ONLY valid JSON: {"key_points": ["point 1", "point 2", ...]}'
         ),
+        "action_points": (
+            "Extract all actionable items, tasks, and recommendations from this YouTube video transcript. "
+            "Return as a JSON list of actionable points.\n\n"
+            f"Transcript:\n{transcript_text[:8000]}\n\n"
+            'Return ONLY valid JSON: {"action_points": ["action 1", "action 2", ...]}'
+        ),
+        "next_steps": (
+            "Based on this YouTube video transcript, identify the logical next steps the viewer should take. "
+            "Return as a numbered list.\n\n"
+            f"Transcript:\n{transcript_text[:8000]}\n\n"
+            'Return ONLY valid JSON: {"next_steps": ["step 1", "step 2", ...]}'
+        ),
+        "structured_edit": (
+            "You are a professional video transcript editor. Produce a COMPREHENSIVE analysis that includes:\n"
+            "1. A concise summary (2-4 sentences)\n"
+            "2. A structured outline with timestamps\n"
+            "3. Key points and insights\n"
+            "4. Actionable next steps\n"
+            "5. A professionally edited transcript with improved readability, punctuation, and paragraph breaks\n\n"
+            f"Transcript:\n{transcript_text[:12000]}\n\n"
+            'Return ONLY valid JSON: {"summary": "...", "outline": ["section 1", ...], "key_points": ["...", ...], "next_steps": ["...", ...], "structured_edit": "professionally edited transcript here..."}'
+        ),
+        "all": (
+            "Perform a COMPLETE analysis of this YouTube video transcript. Include ALL of the following:\n"
+            "- Summary\n"
+            "- Outline\n"
+            "- Key Points\n"
+            "- Action Points\n"
+            "- Next Steps\n\n"
+            f"Transcript:\n{transcript_text[:10000]}\n\n"
+            'Return ONLY valid JSON: {"summary": "...", "outline": [...], "key_points": [...], "action_points": [...], "next_steps": [...]}'
+        ),
     }
 
     prompt = prompts.get(analysis_type, prompts["summary"])
@@ -154,13 +193,26 @@ def analyze_with_kilo(transcript_text: str, analysis_type: str = "summary") -> d
     if analysis_type == "summary":
         return {"summary": content.strip()}
 
-    # For outline/key_points, try to parse JSON from response
+    # For structured_edit, return the full edit
+    if analysis_type == "structured_edit":
+        try:
+            parsed = _json.loads(content.strip())
+            return parsed
+        except _json.JSONDecodeError:
+            import re
+            json_match = re.search(r"```(?:json)?\s*([\s\S]*?)```", content)
+            if json_match:
+                try:
+                    return _json.loads(json_match.group(1).strip())
+                except _json.JSONDecodeError:
+                    pass
+            return {"structured_edit": content.strip()}
+
+    # For all types, try to parse JSON
     try:
-        # Try direct JSON parse
         parsed = _json.loads(content.strip())
         return parsed
     except _json.JSONDecodeError:
-        # Try to extract JSON from markdown code block
         import re
         json_match = re.search(r"```(?:json)?\s*([\s\S]*?)```", content)
         if json_match:
@@ -170,19 +222,19 @@ def analyze_with_kilo(transcript_text: str, analysis_type: str = "summary") -> d
                 pass
         # Fallback: return as text list split by newlines
         lines = [l.strip("- •\t ") for l in content.strip().split("\n") if l.strip()]
-        key = "outline" if analysis_type == "outline" else "key_points"
+        key_map = {"outline": "outline", "key_points": "key_points", "action_points": "action_points", "next_steps": "next_steps"}
+        key = key_map.get(analysis_type, "result")
         return {key: lines}
 
 
 def get_video_title(video_id: str) -> str:
     """Get video title — best effort, no API key required."""
     try:
-        import subprocess
-        result = subprocess.run(
-            ["yt-dlp", "--skip-download", "--print", "title",
-             f"https://www.youtube.com/watch?v={video_id}"],
-            capture_output=True, text=True, timeout=10
-        )
+        proxy_url = get_proxy_url()
+        cmd = ["yt-dlp", "--skip-download", "--print", "title", "--js-runtimes", "node", f"https://www.youtube.com/watch?v={video_id}"]
+        if proxy_url:
+            cmd = ["yt-dlp", "--skip-download", "--print", "title", "--js-runtimes", "node", "--proxy", proxy_url, f"https://www.youtube.com/watch?v={video_id}"]
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
         if result.returncode == 0 and result.stdout.strip():
             return result.stdout.strip()
     except Exception:
@@ -233,9 +285,57 @@ def read_root():
     }
 
 
+class SummaryRequest(BaseModel):
+    url: str = Field(..., min_length=5, max_length=500)
+    language: str = Field(default="en", min_length=2, max_length=10)
+
+
+class SummaryResponse(BaseModel):
+    success: bool
+    video_id: str
+    title: str
+    summary: str
+    generated_at: float
+
+
+@app.post("/api/summary", response_model=SummaryResponse)
+async def summary_endpoint(request: SummaryRequest):
+    """Quick summary of a video transcript (top segments, no AI needed)."""
+    try:
+        video_id = extract_video_id(request.url)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+    language = request.language.strip().lower() if request.language else "en"
+
+    try:
+        segments = get_transcript(request.url, lang=language)
+        if not segments:
+            raise HTTPException(status_code=404, detail="No transcript found")
+        # Build summary from first 6 segments
+        summary_parts = [s.text for s in segments[:6] if s.text.strip()]
+        summary = " ".join(summary_parts)
+        if not summary.strip():
+            summary = "Transcript extracted successfully."
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Summary failed: {exc}")
+
+    title = await asyncio.to_thread(get_video_title, video_id)
+
+    return SummaryResponse(
+        success=True,
+        video_id=video_id,
+        title=title,
+        summary=summary,
+        generated_at=time.time(),
+    )
+
+
 class AnalyzeRequest(BaseModel):
     url: str = Field(..., min_length=5, max_length=500)
-    type: str = Field(default="summary", pattern="^(summary|outline|key_points)$")
+    type: str = Field(default="summary", pattern="^(summary|outline|key_points|action_points|next_steps|structured_edit|all)$")
     language: str = Field(default="en", min_length=2, max_length=10)
 
 
@@ -294,6 +394,88 @@ def health_check():
         "service": "youtube-transcript-api",
         "proxy": proxy_status,
         "kilo": kilo_status,
+    }
+
+
+def get_video_info_from_ytdlp(video_id: str) -> dict:
+    """Get video metadata using yt-dlp with proxy and JS runtime."""
+    try:
+        url = f"https://www.youtube.com/watch?v={video_id}"
+        cmd = [
+            "yt-dlp", "--skip-download", "--dump-json",
+            "--no-playlist", "--no-warnings", "--js-runtimes", "node",
+            url
+        ]
+        proxy_url = get_proxy_url()
+        if proxy_url:
+            cmd.insert(-1, "--proxy")
+            cmd.insert(-1, proxy_url)
+
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+        if result.returncode == 0:
+            return json.loads(result.stdout)
+    except Exception as e:
+        logger.warning(f"yt-dlp video info failed: {e}")
+    return {}
+
+
+@app.post("/api/video-info")
+async def video_info_endpoint(request: VideoInfoRequest):
+    """Get video metadata including description and extracted links."""
+    try:
+        video_id = extract_video_id(request.url)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+    title = await asyncio.to_thread(get_video_title, video_id)
+    info = await asyncio.to_thread(get_video_info_from_ytdlp, video_id)
+
+    # Extract links from description
+    description = info.get("description", "")
+    channel = info.get("uploader", info.get("channel", "Unknown"))
+    duration = info.get("duration", 0)
+    view_count = info.get("view_count", 0)
+    upload_date = info.get("upload_date", "")
+
+    # Extract URLs from description
+    import re as _re
+    link_pattern = _re.compile(r'https?://[^\s<>\"\'\)]+')
+    links = link_pattern.findall(description) if description else []
+
+    # Get transcript
+    transcript_lines = []
+    plain_text_parts = []
+    plain_text_with_ts = []
+    markdown_parts = []
+    try:
+        segments = get_transcript(request.url, lang="en")
+        for segment in segments:
+            ts = seconds_to_timestamp(segment.start)
+            transcript_lines.append({
+                "timestamp": ts,
+                "seconds": int(segment.start),
+                "text": segment.text,
+            })
+            plain_text_parts.append(segment.text)
+            plain_text_with_ts.append(f"[{ts}] {segment.text}")
+            markdown_parts.append(f"- **[{ts}]** {segment.text}")
+    except Exception:
+        pass  # Transcript is optional for video-info
+
+    return {
+        "success": True,
+        "video_id": video_id,
+        "title": title,
+        "channel": channel,
+        "duration": duration,
+        "view_count": view_count,
+        "upload_date": upload_date,
+        "description": description,
+        "links": links,
+        "transcript": transcript_lines,
+        "plain_text": "\n".join(plain_text_parts),
+        "plain_text_with_timestamps": "\n".join(plain_text_with_ts),
+        "markdown": "\n".join(markdown_parts),
     }
 
 
