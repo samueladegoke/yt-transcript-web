@@ -56,8 +56,8 @@ export default {
                 sm: "calc(var(--radius) - 4px)",
             },
             fontFamily: {
-                sans: ["Space Grotesk", "sans-serif"],
-                display: ["Space Grotesk", "sans-serif"],
+                sans: ["Satoshi", "system-ui", "sans-serif"],
+                display: ["Clash Display", "Satoshi", "sans-serif"],
             },
         }
     },
