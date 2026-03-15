@@ -1,0 +1,171 @@
+#!/bin/bash
+# ═══════════════════════════════════════════════════════════════════
+# Pre-commit hook: Feature Protection Gate
+#
+# Prevents accidental deletion of features by:
+# 1. Checking for >30% line reduction in critical files
+# 2. Validating all required API endpoints exist in main.py
+# 3. Validating all required MCP tools exist in mcp_proxy.py
+# 4. Requiring explicit BREAKING CHANGE: in commit message for major changes
+#
+# Install: cp .githooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+# ═══════════════════════════════════════════════════════════════════
+
+set -e
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+ERRORS=0
+
+# ─── 1. Critical File Line Count Protection ──────────────────────────
+# If a critical file loses >30% of its lines, BLOCK the commit
+
+CRITICAL_FILES=(
+    "frontend/src/App.jsx"
+    "backend/main.py"
+    "backend/app/mcp_proxy.py"
+    "backend/app/mcp_server.py"
+    "backend/app/transcript_service.py"
+)
+
+check_line_count() {
+    local file=$1
+    if [ ! -f "$file" ]; then
+        return
+    fi
+    
+    # Get current line count
+    local current_lines=$(wc -l < "$file")
+    
+    # Get line count from HEAD (last committed version)
+    local head_lines=$(git show HEAD:"$file" 2>/dev/null | wc -l || echo "$current_lines")
+    
+    # If this is a new file, skip check
+    if [ "$head_lines" -eq 0 ]; then
+        return
+    fi
+    
+    # Calculate reduction percentage
+    local reduction=$(( (head_lines - current_lines) * 100 / head_lines ))
+    
+    # Warn at 20%, block at 30%
+    if [ "$reduction" -gt 30 ]; then
+        echo -e "${RED}❌ CRITICAL: $file lost ${reduction}% of its lines (${head_lines} → ${current_lines})${NC}"
+        echo -e "${YELLOW}   This looks like an accidental feature deletion.${NC}"
+        echo -e "${YELLOW}   If intentional, commit with: --no-verify -m \"BREAKING CHANGE: reason\"${NC}"
+        ERRORS=$((ERRORS + 1))
+    elif [ "$reduction" -gt 20 ]; then
+        echo -e "${YELLOW}⚠️  WARNING: $file lost ${reduction}% of its lines (${head_lines} → ${current_lines})${NC}"
+        echo -e "${YELLOW}   If intentional, this is fine. Just double-check.${NC}"
+    fi
+}
+
+for file in "${CRITICAL_FILES[@]}"; do
+    check_line_count "$file"
+done
+
+# ─── 2. Required Endpoint Validation ─────────────────────────────────
+# Ensure main.py still has all required API endpoints
+
+REQUIRED_ENDPOINTS=(
+    "api/extract"
+    "api/video-info"
+    "api/summary"
+    "api/analyze"
+)
+
+MAIN_FILE="backend/main.py"
+if [ -f "$MAIN_FILE" ]; then
+    for endpoint in "${REQUIRED_ENDPOINTS[@]}"; do
+        if ! grep -q "$endpoint" "$MAIN_FILE"; then
+            echo -e "${RED}❌ CRITICAL: Required endpoint '$endpoint' not found in $MAIN_FILE${NC}"
+            ERRORS=$((ERRORS + 1))
+        fi
+    done
+fi
+
+# ─── 3. Required Analysis Types Validation ───────────────────────────
+# Ensure main.py supports all required analysis types
+
+REQUIRED_TYPES=("summary" "outline" "key_points" "action_points" "next_steps" "structured_edit" "all")
+
+if [ -f "$MAIN_FILE" ]; then
+    for atype in "${REQUIRED_TYPES[@]}"; do
+        if ! grep -q "\"$atype\"" "$MAIN_FILE"; then
+            echo -e "${RED}❌ CRITICAL: Analysis type '$atype' not found in $MAIN_FILE${NC}"
+            ERRORS=$((ERRORS + 1))
+        fi
+    done
+fi
+
+# ─── 4. Required MCP Tools Validation ────────────────────────────────
+# Ensure mcp_proxy.py has all required tools
+
+MCP_FILE="backend/app/mcp_proxy.py"
+REQUIRED_TOOLS=("get_transcript" "get_video_info" "analyze" "check_health")
+
+if [ -f "$MCP_FILE" ]; then
+    for tool in "${REQUIRED_TOOLS[@]}"; do
+        if ! grep -q "$tool" "$MCP_FILE"; then
+            echo -e "${RED}❌ CRITICAL: MCP tool '$tool' not found in $MCP_FILE${NC}"
+            ERRORS=$((ERRORS + 1))
+        fi
+    done
+fi
+
+# ─── 5. Required Feature Strings Validation ──────────────────────────
+# These strings must exist in App.jsx (feature markers)
+
+FEATURE_MARKERS=(
+    "handleAIAnalysis"
+    "structured_edit"
+    "action_points"
+    "next_steps"
+    "api/analyze"
+    "api/video-info"
+)
+
+APP_FILE="frontend/src/App.jsx"
+if [ -f "$APP_FILE" ]; then
+    for marker in "${FEATURE_MARKERS[@]}"; do
+        if ! grep -q "$marker" "$APP_FILE"; then
+            echo -e "${RED}❌ CRITICAL: Feature marker '$marker' not found in $APP_FILE${NC}"
+            echo -e "${YELLOW}   This usually means a feature was accidentally deleted.${NC}"
+            ERRORS=$((ERRORS + 1))
+        fi
+    done
+fi
+
+# ─── 6. Line Count Threshold for Project Spec ────────────────────────
+# App.jsx should never drop below 500 lines (has all features)
+
+if [ -f "$APP_FILE" ]; then
+    APP_LINES=$(wc -l < "$APP_FILE")
+    if [ "$APP_LINES" -lt 500 ]; then
+        echo -e "${RED}❌ CRITICAL: App.jsx is only ${APP_LINES} lines (minimum: 500)${NC}"
+        echo -e "${YELLOW}   Features are likely missing. Expected 700+ lines.${NC}"
+        ERRORS=$((ERRORS + 1))
+    fi
+fi
+
+# ─── Summary ─────────────────────────────────────────────────────────
+if [ "$ERRORS" -gt 0 ]; then
+    echo ""
+    echo -e "${RED}═══════════════════════════════════════════════════════${NC}"
+    echo -e "${RED}  PRE-COMMIT BLOCKED: $ERRORS issue(s) found${NC}"
+    echo -e "${RED}═══════════════════════════════════════════════════════${NC}"
+    echo ""
+    echo "To bypass (if intentional):"
+    echo "  git commit --no-verify -m \"BREAKING CHANGE: reason for the change\""
+    echo ""
+    echo "To check what changed:"
+    echo "  git diff --stat HEAD"
+    echo ""
+    exit 1
+fi
+
+echo -e "${GREEN}✅ Pre-commit checks passed${NC}"
+exit 0

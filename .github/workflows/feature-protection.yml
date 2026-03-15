@@ -1,0 +1,159 @@
+name: Feature Protection Gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  feature-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check critical files for line reduction
+        run: |
+          ERRORS=0
+          
+          check_line_count() {
+            local file=$1
+            local min_lines=${2:-500}
+            
+            if [ ! -f "$file" ]; then
+              echo "⚠️  $file not found (may be new)"
+              return
+            fi
+            
+            local current_lines=$(wc -l < "$file")
+            
+            if [ "$current_lines" -lt "$min_lines" ]; then
+              echo "❌ $file is only $current_lines lines (minimum: $min_lines)"
+              ERRORS=$((ERRORS + 1))
+            else
+              echo "✅ $file: $current_lines lines (>= $min_lines)"
+            fi
+          }
+          
+          echo "=== Checking critical file sizes ==="
+          check_line_count "frontend/src/App.jsx" 700
+          check_line_count "backend/main.py" 300
+          
+          if [ "$ERRORS" -gt 0 ]; then
+            echo ""
+            echo "❌ $ERRORS critical file(s) are too small. Features may have been deleted."
+            exit 1
+          fi
+
+      - name: Check required API endpoints
+        run: |
+          MISSING=0
+          
+          check_endpoint() {
+            if ! grep -q "$1" "backend/main.py"; then
+              echo "❌ Missing endpoint: $1"
+              MISSING=$((MISSING + 1))
+            else
+              echo "✅ Found: $1"
+            fi
+          }
+          
+          echo "=== Checking API endpoints ==="
+          check_endpoint "api/extract"
+          check_endpoint "api/video-info"
+          check_endpoint "api/summary"
+          check_endpoint "api/analyze"
+          
+          if [ "$MISSING" -gt 0 ]; then
+            echo ""
+            echo "❌ $MISSING required endpoint(s) missing from main.py"
+            exit 1
+          fi
+
+      - name: Check required analysis types
+        run: |
+          MISSING=0
+          
+          check_type() {
+            if ! grep -q "\"$1\"" "backend/main.py"; then
+              echo "❌ Missing type: $1"
+              MISSING=$((MISSING + 1))
+            else
+              echo "✅ Found: $1"
+            fi
+          }
+          
+          echo "=== Checking analysis types ==="
+          check_type "summary"
+          check_type "outline"
+          check_type "key_points"
+          check_type "action_points"
+          check_type "next_steps"
+          check_type "structured_edit"
+          check_type "all"
+          
+          if [ "$MISSING" -gt 0 ]; then
+            echo ""
+            echo "❌ $MISSING required analysis type(s) missing"
+            exit 1
+          fi
+
+      - name: Check frontend feature markers
+        run: |
+          MISSING=0
+          
+          check_marker() {
+            if ! grep -q "$1" "frontend/src/App.jsx"; then
+              echo "❌ Missing feature: $1"
+              MISSING=$((MISSING + 1))
+            else
+              echo "✅ Found: $1"
+            fi
+          }
+          
+          echo "=== Checking frontend features ==="
+          check_marker "handleAIAnalysis"
+          check_marker "structured_edit"
+          check_marker "action_points"
+          check_marker "next_steps"
+          check_marker "api/analyze"
+          check_marker "api/video-info"
+          
+          if [ "$MISSING" -gt 0 ]; then
+            echo ""
+            echo "❌ $MISSING required feature(s) missing from frontend"
+            exit 1
+          fi
+
+      - name: Check MCP tools
+        run: |
+          MISSING=0
+          
+          check_tool() {
+            if ! grep -q "$1" "backend/app/mcp_proxy.py"; then
+              echo "❌ Missing tool: $1"
+              MISSING=$((MISSING + 1))
+            else
+              echo "✅ Found: $1"
+            fi
+          }
+          
+          echo "=== Checking MCP tools ==="
+          check_tool "get_transcript"
+          check_tool "get_video_info"
+          check_tool "analyze"
+          check_tool "check_health"
+          
+          if [ "$MISSING" -gt 0 ]; then
+            echo ""
+            echo "❌ $MISSING required MCP tool(s) missing"
+            exit 1
+          fi
+
+      - name: Verify build
+        working-directory: frontend
+        run: |
+          echo "=== Verifying frontend build ==="
+          npm ci
+          npm run build
+          echo "✅ Build successful"
