@@ -80,9 +80,20 @@ def get_transcript(url: str, lang: str = "en") -> List[TranscriptSegment]:
     proxy_config = get_proxy_config()
 
     # Load YouTube cookies for bot protection bypass
-    cookies_file = os.path.join(os.path.dirname(__file__), "..", "youtube_cookies.txt")
+    # Check file first, then YOUTUBE_COOKIES_B64 env var
+    import tempfile, base64
     http_client = None
-    if os.path.exists(cookies_file):
+    cookies_file = os.path.join(os.path.dirname(__file__), "..", "youtube_cookies.txt")
+    if not os.path.exists(cookies_file):
+        b64 = os.getenv("YOUTUBE_COOKIES_B64")
+        if b64:
+            try:
+                cookies_file = tempfile.mktemp(suffix=".txt")
+                with open(cookies_file, "wb") as f:
+                    f.write(base64.b64decode(b64))
+            except Exception:
+                cookies_file = None
+    if cookies_file and os.path.exists(cookies_file):
         cj = MozillaCookieJar(cookies_file)
         try:
             cj.load(ignore_discard=True, ignore_expires=True)

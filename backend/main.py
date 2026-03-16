@@ -205,9 +205,19 @@ def get_video_title(video_id: str) -> str:
     """Get video title — best effort, no API key required."""
     try:
         proxy_url = get_proxy_url()
+        import tempfile as _tf, base64 as _b64
         cookies_file = os.path.join(os.path.dirname(__file__), "youtube_cookies.txt")
+        if not os.path.exists(cookies_file):
+            b64 = os.getenv("YOUTUBE_COOKIES_B64")
+            if b64:
+                try:
+                    cookies_file = _tf.mktemp(suffix=".txt")
+                    with open(cookies_file, "wb") as f:
+                        f.write(_b64.b64decode(b64))
+                except Exception:
+                    cookies_file = None
         cmd = ["yt-dlp", "--skip-download", "--print", "title", "--js-runtimes", "node", f"https://www.youtube.com/watch?v={video_id}"]
-        if os.path.exists(cookies_file):
+        if cookies_file and os.path.exists(cookies_file):
             cmd.insert(1, "--cookies")
             cmd.insert(2, cookies_file)
         if proxy_url:
@@ -390,13 +400,23 @@ def get_video_info_from_ytdlp(video_id: str) -> dict:
     """Get video metadata using yt-dlp with proxy and JS runtime."""
     try:
         url = f"https://www.youtube.com/watch?v={video_id}"
+        import tempfile as _tf2, base64 as _b642
         cookies_file = os.path.join(os.path.dirname(__file__), "youtube_cookies.txt")
+        if not os.path.exists(cookies_file):
+            b64 = os.getenv("YOUTUBE_COOKIES_B64")
+            if b64:
+                try:
+                    cookies_file = _tf2.mktemp(suffix=".txt")
+                    with open(cookies_file, "wb") as f:
+                        f.write(_b642.b64decode(b64))
+                except Exception:
+                    cookies_file = None
         cmd = [
             "yt-dlp", "--skip-download", "--dump-json",
             "--no-playlist", "--no-warnings", "--js-runtimes", "node",
             url
         ]
-        if os.path.exists(cookies_file):
+        if cookies_file and os.path.exists(cookies_file):
             cmd.insert(1, "--cookies")
             cmd.insert(2, cookies_file)
         proxy_url = get_proxy_url()
