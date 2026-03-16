@@ -197,8 +197,8 @@ Format using clear Markdown headers (##)."""
     if not content:
         raise ValueError("KILO API returned empty response")
 
-    # Return raw text under "result" key (original format)
-    return {"result": content.strip()}
+    # Return raw text under the analysis_type key (frontend expects result.structured_edit, etc.)
+    return {analysis_type: content.strip()}
 
 
 def get_video_title(video_id: str) -> str:
