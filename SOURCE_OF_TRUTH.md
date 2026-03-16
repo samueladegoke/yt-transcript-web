@@ -172,6 +172,18 @@ Any change to **protected files** must pass through the pre-commit hook at `.git
 
 ## 🔄 Change Log
 
+### 2026-03-16 (10:59 UTC) — Restore Professional Edit Download Buttons
+**Why:** Commit `113dfaa` had two download buttons (.txt + .md) positioned at the top-right of the Professional Edit result header. A later UI overhaul replaced this with a generic single download button, losing the dual-format download for Professional Edit.
+
+**Changes:**
+- **Added** special rendering case for `structured_edit` results (checks `aiResult.analysis_type === 'structured_edit'`)
+- **Restored** dual download buttons: `Download .txt` + `Download .md` at top-right of result header
+- **File naming:** `getSafeFilename(title, '_edited').txt/.md` → `{clean_title}_{YYYY-MM-DD}_edited.txt/.md`
+- **Layout:** `flex justify-between` — title left, download buttons right
+
+**File:** `frontend/src/App.jsx` — `DownloadOptions` component, AI results display section
+**Source:** Restored from commit `113dfaa` (git show `113dfaa:frontend/src/App.jsx` lines 441-465)
+
 ### 2026-03-16 (10:13 UTC) — Consolidation + Source of Truth
 **Why:** Two versions of the project existed — `yt-transcript-web/` (outer, deployed UI) and `yt-transcript-upgrade/` (inner, richer backend with structured_edit + KILO + truncation fix). Risk of confusion, deletion of the wrong version, and hallucinations.
 

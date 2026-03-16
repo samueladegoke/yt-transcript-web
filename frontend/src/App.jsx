@@ -389,8 +389,48 @@ function DownloadOptions({ data, url }) {
               <p className="text-sm text-red-400">Error: {aiError}</p>
             ) : (
               <div className="space-y-4">
-                {/* Render result based on what's returned */}
-                {aiResult?.result && typeof aiResult.result === 'object' ? (
+                {/* Professional Edit: special rendering with download buttons */}
+                {aiResult?.analysis_type === 'structured_edit' && aiResult?.result?.structured_edit ? (
+                  <div>
+                    <div className="flex justify-between items-center mb-3 border-b border-purple-700 pb-2">
+                      <h4 className="text-sm font-semibold text-purple-300">Professional Edit</h4>
+                      <div className="flex gap-2">
+                        <motion.button
+                          whileHover={{ scale: 1.03 }}
+                          whileTap={{ scale: 0.97 }}
+                          onClick={() =>
+                            downloadBlob(
+                              aiResult.result.structured_edit,
+                              `${getSafeFilename(aiResult.title, '_edited')}.txt`
+                            )
+                          }
+                          className="flex items-center gap-1 rounded border border-purple-600/50 bg-purple-900/30 px-2.5 py-1 text-xs text-purple-300 hover:bg-purple-900/50 transition"
+                        >
+                          <Download className="h-3 w-3" />
+                          Download .txt
+                        </motion.button>
+                        <motion.button
+                          whileHover={{ scale: 1.03 }}
+                          whileTap={{ scale: 0.97 }}
+                          onClick={() =>
+                            downloadBlob(
+                              aiResult.result.structured_edit,
+                              `${getSafeFilename(aiResult.title, '_edited')}.md`,
+                              'text/markdown;charset=utf-8'
+                            )
+                          }
+                          className="flex items-center gap-1 rounded bg-purple-600 px-2.5 py-1 text-xs text-white hover:bg-purple-500 transition"
+                        >
+                          <FileCode className="h-3 w-3" />
+                          Download .md
+                        </motion.button>
+                      </div>
+                    </div>
+                    <div className="rounded-lg bg-[#0A1832]/60 p-4 text-sm leading-relaxed text-slate-300 whitespace-pre-wrap">
+                      {aiResult.result.structured_edit}
+                    </div>
+                  </div>
+                ) : aiResult?.result && typeof aiResult.result === 'object' ? (
                   Object.entries(aiResult.result).map(([key, value]) => (
                     <div key={key}>
                       <h4 className="mb-2 text-sm font-semibold text-purple-300 capitalize">
