@@ -111,12 +111,8 @@ def analyze_with_kilo(
     }
     system_prompt = system_prompts.get(analysis_type, system_prompts["summary"])
 
-    # Truncate very long transcripts to avoid token limits
-    max_transcript_chars = 12000 if analysis_type in ("structured_edit", "all") else 8000
-    if len(transcript_text) > max_transcript_chars:
-        transcript_text = transcript_text[:max_transcript_chars] + "\n\n[... transcript truncated for length ...]"
-
     # Build context with transcript + optional description + links
+    # NOTE: Do NOT truncate — original rule: "DO NOT lose or change any words, phrases, or letters"
     context_parts = [f"Transcript:\n{transcript_text}"]
     if description:
         context_parts.append(f"\nVideo Description:\n{description}")
@@ -168,8 +164,9 @@ Please provide a complete analysis with:
 Format using clear Markdown headers (##)."""
 
     # Call KILO API (higher tokens for comprehensive analyses)
+    # structured_edit needs 16000+ tokens for all 4 sections (full transcript + summary + action points + next steps)
     api_url = f"{config['base_url'].rstrip('/')}/chat/completions"
-    max_tokens = 4000 if analysis_type in ("structured_edit", "all") else 2000
+    max_tokens = 16000 if analysis_type in ("structured_edit", "all") else 2000
     payload = {
         "model": config["model"],
         "messages": [
@@ -191,7 +188,7 @@ Format using clear Markdown headers (##)."""
     )
 
     try:
-        with urllib.request.urlopen(req, timeout=120) as resp:
+        with urllib.request.urlopen(req, timeout=300) as resp:
             data = __import__("json").loads(resp.read().decode("utf-8"))
     except Exception as exc:
         raise ValueError(f"KILO API call failed: {exc}")
