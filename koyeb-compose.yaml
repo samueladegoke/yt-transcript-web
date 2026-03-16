@@ -1,0 +1,29 @@
+name: yt-transcript-api
+services:
+  - name: yt-transcript-api
+    github:
+      repository: samueladegoke/yt-transcript-web
+      branch: main
+    docker:
+      dockerfile: backend/Dockerfile
+    ports:
+      - port: 8000
+        protocol: http
+    env:
+      - key: KILO_BASE_URL
+        value: https://api.kilo.ai/api/gateway
+      - key: KILO_MODEL
+        value: minimax/minimax-m2.5:free
+      - key: CORS_ORIGINS
+        value: https://yt-transcript-web.pages.dev,http://localhost:5173
+      - key: YT_PROXY
+        value: http://VYwBbML7ehffgOnT:pnP2ZMQCffoYB2oc_country-ng_city-abuja_session-koWiEtUJ_lifetime-48h_streaming-1@geo.iproyal.com:12321
+      - key: KILO_API_KEY
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbnYiOiJwcm9kdWN0aW9uIiwia2lsb1VzZXJJZCI6Im9hdXRoL2dvb2dsZToxMDIyMDU5Mzc2ODkxNTk3NjIxNDAiLCJhcGlUb2tlblBlcHBlciI6bnVsbCwidmVyc2lvbiI6MywiaWF0IjoxNzczMDM3MDY2LCJleHAiOjE5MzA3MTcwNjZ9.Jcob9k8Yygmpf5SN32XMMsuriuISm_n2m0NTHwGaoeM
+    regions:
+      - fra
+    instance_type: nano
+    health_check:
+      http:
+        path: /health
+        port: 8000
