@@ -7,6 +7,8 @@ import os
 from typing import Optional, List
 from dataclasses import dataclass
 
+import requests
+from http.cookiejar import MozillaCookieJar
 from youtube_transcript_api import YouTubeTranscriptApi
 from youtube_transcript_api.proxies import GenericProxyConfig
 
@@ -62,7 +64,7 @@ def get_proxy_config() -> Optional[GenericProxyConfig]:
 
 def get_transcript(url: str, lang: str = "en") -> List[TranscriptSegment]:
     """
-    Fetch transcript for a YouTube video using proxy.
+    Fetch transcript for a YouTube video using proxy + cookies.
 
     Args:
         url: YouTube video URL or video ID
@@ -77,8 +79,20 @@ def get_transcript(url: str, lang: str = "en") -> List[TranscriptSegment]:
     video_id = extract_video_id(url)
     proxy_config = get_proxy_config()
 
+    # Load YouTube cookies for bot protection bypass
+    cookies_file = os.path.join(os.path.dirname(__file__), "..", "youtube_cookies.txt")
+    http_client = None
+    if os.path.exists(cookies_file):
+        cj = MozillaCookieJar(cookies_file)
+        try:
+            cj.load(ignore_discard=True, ignore_expires=True)
+            http_client = requests.Session()
+            http_client.cookies = cj
+        except Exception:
+            http_client = None
+
     try:
-        api = YouTubeTranscriptApi(proxy_config=proxy_config)
+        api = YouTubeTranscriptApi(proxy_config=proxy_config, http_client=http_client)
         result = api.fetch(video_id, languages=[lang])
     except Exception as exc:
         error_type = type(exc).__name__

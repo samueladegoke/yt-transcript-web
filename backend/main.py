@@ -205,9 +205,14 @@ def get_video_title(video_id: str) -> str:
     """Get video title — best effort, no API key required."""
     try:
         proxy_url = get_proxy_url()
+        cookies_file = os.path.join(os.path.dirname(__file__), "youtube_cookies.txt")
         cmd = ["yt-dlp", "--skip-download", "--print", "title", "--js-runtimes", "node", f"https://www.youtube.com/watch?v={video_id}"]
+        if os.path.exists(cookies_file):
+            cmd.insert(1, "--cookies")
+            cmd.insert(2, cookies_file)
         if proxy_url:
-            cmd = ["yt-dlp", "--skip-download", "--print", "title", "--js-runtimes", "node", "--proxy", proxy_url, f"https://www.youtube.com/watch?v={video_id}"]
+            cmd.insert(-1, "--proxy")
+            cmd.insert(-1, proxy_url)
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
         if result.returncode == 0 and result.stdout.strip():
             return result.stdout.strip()
@@ -385,11 +390,15 @@ def get_video_info_from_ytdlp(video_id: str) -> dict:
     """Get video metadata using yt-dlp with proxy and JS runtime."""
     try:
         url = f"https://www.youtube.com/watch?v={video_id}"
+        cookies_file = os.path.join(os.path.dirname(__file__), "youtube_cookies.txt")
         cmd = [
             "yt-dlp", "--skip-download", "--dump-json",
             "--no-playlist", "--no-warnings", "--js-runtimes", "node",
             url
         ]
+        if os.path.exists(cookies_file):
+            cmd.insert(1, "--cookies")
+            cmd.insert(2, cookies_file)
         proxy_url = get_proxy_url()
         if proxy_url:
             cmd.insert(-1, "--proxy")
