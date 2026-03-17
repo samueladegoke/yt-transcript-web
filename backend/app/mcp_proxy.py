@@ -27,7 +27,8 @@ RENDER_BACKEND_URL = os.getenv(
 
 def _get_client() -> httpx.AsyncClient:
     """Create an HTTP client with appropriate timeout."""
-    return httpx.AsyncClient(timeout=60.0)
+    timeout = float(os.getenv("BACKEND_TIMEOUT", "200.0"))
+    return httpx.AsyncClient(timeout=timeout)
 
 
 @mcp.tool()
