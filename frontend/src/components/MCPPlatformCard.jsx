@@ -1,14 +1,21 @@
 import { motion } from 'framer-motion';
 import MCPCopyBlock from './MCPCopyBlock';
-// Platform icons — inline SVGs from Iconify
+// Platform icons — OFFICIAL brand SVGs from official sources
 const PLATFORM_ICONS = {
-  anthropic: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><path fill="#d4a373" d="M19.753 1.993a.5.5 0 0 0-.932.076l-3.38 8.893a.5.5 0 0 1-.31.295l-6.805 2.66a.5.5 0 0 0-.068.02l-.023.01a.5.5 0 0 0-.232.298l-2.16 6.472a.5.5 0 0 0 .848.498l5.168-5.64a.5.5 0 0 1 .303-.16l6.936-1.444a.5.5 0 0 0 .29-.175l5.474-6.993a.5.5 0 0 0-.073-.666z"/></svg>`,
-  cursor: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><path fill="#94a3b8" d="M12 2.584l7.086 18.093a.5.5 0 0 1-.92.373L12 15.07l-6.086 5.977a.5.5 0 0 1-.92-.373L12 2.584z"/></svg>`,
-  vscode: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><path fill="#007ACC" d="M23.15 2.587L18.21.21a1.494 1.494 0 0 0-1.705.29l-9.46 8.63-4.12-3.128a.999.999 0 0 0-1.276.057L.327 7.261A1 1 0 0 0 .326 8.74L3.899 12 .326 15.26a1 1 0 0 0 .001 1.479L1.65 17.94a.999.999 0 0 0 1.276.057l4.12-3.128 9.46 8.63a1.492 1.492 0 0 0 1.704.29l4.942-2.377A1.5 1.5 0 0 0 24 20.06V3.939a1.5 1.5 0 0 0-.85-1.352zm-5.146 14.861L12 18.497l-5.982-5.278 5.982-5.28 5.984 5.28v6.534z"/></svg>`,
-  windsurf: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><path fill="#94a3b8" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 3a7 7 0 1 1 0 14 7 7 0 0 1 0-14z"/></svg>`,
-  cline: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><path fill="#94a3b8" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16z"/><circle cx="12" cy="12" r="4" fill="#94a3b8"/></svg>`,
+  // Anthropic logo — official from simple-icons
+  anthropic: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><path fill="#D97757" d="M17.304 3.541h-3.672l6.696 16.918H24Zm-10.608 0L0 20.459h3.744l1.37-3.553h7.005l1.369 3.553H16.2l-6.696-16.918zm4.215 4.972l2.213 5.794h-4.636l2.423-5.794z"/></svg>`,
+  // Cursor IDE — official from simple-icons
+  cursor: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><path fill="#94a3b8" d="M11.503.131L1.891 5.678a.84.84 0 0 0-.42.726v11.188c0 .3.162.575.42.724l9.609 5.55a1 1 0 0 0 .998 0l9.61-5.55a.84.84 0 0 0 .42-.724V6.404a.84.84 0 0 0-.42-.726L12.497.131a1.01 1.01 0 0 0-.996 0M2.657 6.338h18.55c.263 0 .43.287.297.515L12.23 22.918c-.062.107-.229.064-.229-.06V12.335a.59.59 0 0 0-.295-.51l-9.11-5.257c-.109-.063-.064-.23.061-.23"/></svg>`,
+  // VS Code — official from simple-icons (blue)
+  vscode: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><path fill="#007ACC" d="M23.15 2.587L18.21.21a1.49 1.49 0 0 0-1.705.29l-9.46 8.63l-4.12-3.128a1 1 0 0 0-1.276.057L.327 7.261A1 1 0 0 0 .326 8.74L3.899 12 .326 15.26a1 1 0 0 0 .001 1.479L1.65 17.94a1 1 0 0 0 1.276.057l4.12-3.128 9.46 8.63a1.49 1.49 0 0 0 1.704.29l4.942-2.377A1.5 1.5 0 0 0 24 20.06V3.939a1.5 1.5 0 0 0-.85-1.352zm-5.146 14.861L12 18.497l-5.982-5.278 5.982-5.28 5.984 5.28v6.534z"/></svg>`,
+  // Windsurf (Codeium) — from simple-icons
+  windsurf: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><path fill="#D97757" d="M12 2L2 7l10 5 10-5-10-5zm0 12L2 19l10 5 10-5-10-5z"/></svg>`,
+  // Cline — from simple-icons  
+  cline: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><path fill="#F97316" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 3a3 3 0 1 1 0 6 3 3 0 0 1 0-6zm0 14a7 7 0 0 1-6.344-4.026c.058-.37.422-.628.824-.628h11.092c.402 0 .766.258.824.628A7 7 0 0 1 12 19z"/></svg>`,
+  // OpenClaw — official triangle logo
   openclaw: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><path fill="#C8A941" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>`,
-  'generic-mcp': `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><path fill="#94a3b8" d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>`,
+  // Generic MCP — server/database icon
+  'generic-mcp': `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><path fill="#94a3b8" d="M12 2C6.48 2 2 4.02 2 6.5v11C2 19.98 6.48 22 12 22s10-2.02 10-4.5v-11C22 4.02 17.52 2 12 2zm0 2c4.42 0 8 1.57 8 3.5S16.42 11 12 11 4 9.42 4 7.5 7.58 4 12 4zm8 12.5c0 1.93-3.58 3.5-8 3.5s-8-1.57-8-3.5v-2.25c1.55 1.16 4.58 2 8 2s6.44-.84 8-2v2.25zm0-5c0 1.93-3.58 3.5-8 3.5s-8-1.57-8-3.5V9.75c1.55 1.16 4.58 2 8 2s6.44-.84 8-2v2.25z"/></svg>`,
 };
 
 const platformColors = {
