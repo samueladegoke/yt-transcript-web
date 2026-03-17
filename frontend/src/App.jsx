@@ -200,15 +200,192 @@ function FilteredTranscriptDisplay({ lines, searchQuery }) {
   return <TranscriptDisplay lines={filtered} />;
 }
 
-// ─── DownloadOptions + AI Analysis Component (premium design) ────────────────
+// ─── AI Analysis Card (Magic-ui neon-gradient-card inspired) ─────────────────
 
-function DownloadOptions({ data, url }) {
-  const [copied, setCopied] = useState(false);
+function AIAnalysisCard({ data, url }) {
   const [aiLoading, setAiLoading] = useState(null);
   const [aiResult, setAiResult] = useState(null);
   const [aiError, setAiError] = useState('');
 
-  // Build download content from available data
+  const transcriptLines = data.transcript_lines || data.transcript || [];
+  const plainText = data.plain_text || transcriptLines.map((l) => l.text).join('\n');
+  const plainTextWithTimestamps =
+    data.plain_text_with_timestamps ||
+    transcriptLines.map((l) => `[${l.timestamp || formatTime(l.start)}] ${l.text}`).join('\n');
+
+  const handleAIAnalysis = async (analysisType) => {
+    setAiLoading(analysisType);
+    setAiResult(null);
+    setAiError('');
+    try {
+      if (analysisType === 'structured_edit') {
+        const startRes = await fetch(`${API_BASE_URL}/api/analyze/start`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: url, type: analysisType, transcript: plainTextWithTimestamps }),
+        });
+        const startData = await startRes.json();
+        if (!startRes.ok) throw new Error(startData.detail || 'Failed to start analysis');
+        const jobId = startData.job_id;
+
+        let status = 'pending';
+        while (status === 'pending' || status === 'running') {
+          await new Promise(resolve => setTimeout(resolve, 5000));
+          const statusRes = await fetch(`${API_BASE_URL}/api/analyze/status/${jobId}`);
+          const statusData = await statusRes.json();
+          status = statusData.status;
+          if (status === 'failed') throw new Error('Analysis failed on server');
+        }
+
+        const resultRes = await fetch(`${API_BASE_URL}/api/analyze/result/${jobId}`);
+        const result = await resultRes.json();
+        if (!resultRes.ok) throw new Error(result.detail || 'Failed to fetch result');
+        setAiResult(result);
+      } else {
+        const response = await fetch(`${API_BASE_URL}/api/analyze`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: url, type: analysisType, transcript: plainTextWithTimestamps }),
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.detail || 'Analysis failed');
+        setAiResult(result);
+      }
+    } catch (err) {
+      setAiError(err.message);
+    } finally {
+      setAiLoading(null);
+    }
+  };
+
+  const aiButtons = [
+    { type: 'summary', label: 'Summary', icon: '📝', color: '#D4AF37', glowColor: 'rgba(212,175,55,0.12)' },
+    { type: 'action_points', label: 'Action Points', icon: '🎯', color: '#00D4FF', glowColor: 'rgba(0,212,255,0.12)' },
+    { type: 'next_steps', label: 'Next Steps', icon: '🚀', color: '#10B981', glowColor: 'rgba(16,185,129,0.12)' },
+    { type: 'structured_edit', label: 'Professional Edit', icon: '✨', color: '#A855F7', glowColor: 'rgba(168,85,247,0.12)' },
+  ];
+
+  return (
+    <div className="space-y-5">
+      {/* AI Analysis — neon-bordered card */}
+      <div className="neon-border-card rounded-2xl p-6 bg-[#0A1832]/60 backdrop-blur-sm">
+        <h3 className="mb-4 flex items-center gap-2.5 text-sm font-semibold uppercase tracking-[0.12em] text-purple-300/80">
+          <Sparkles className="h-4 w-4 text-purple-400" />
+          AI Analysis
+        </h3>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {aiButtons.map(({ type, label, icon, color, glowColor }) => (
+            <motion.button
+              key={type}
+              whileHover={{ scale: 1.03, y: -2, boxShadow: `0 8px 30px ${glowColor}` }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => handleAIAnalysis(type)}
+              disabled={!!aiLoading}
+              className="group relative flex flex-col items-center gap-2 rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-4 text-sm text-slate-300 hover:border-white/[0.15] hover:bg-white/[0.06] transition-all disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden"
+            >
+              {/* Subtle glow on hover */}
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ background: `radial-gradient(circle at center, ${glowColor}, transparent 70%)` }} />
+              {aiLoading === type ? (
+                <Loader2 className="h-6 w-6 animate-spin relative z-10" style={{ color }} />
+              ) : (
+                <span className="text-2xl relative z-10">{icon}</span>
+              )}
+              <span className="relative z-10 font-medium text-xs">{aiLoading === type ? 'Analyzing...' : label}</span>
+            </motion.button>
+          ))}
+        </div>
+
+        {/* AI Results */}
+        <AnimatePresence>
+          {(aiResult || aiError) && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+              className="mt-5 rounded-xl border border-purple-400/15 bg-purple-400/[0.04] p-5"
+            >
+              {aiError ? (
+                <p className="text-sm text-red-400">Error: {aiError}</p>
+              ) : (
+                <div className="space-y-4">
+                  {aiResult?.analysis_type === 'structured_edit' && aiResult?.result?.structured_edit ? (
+                    <div>
+                      <div className="flex justify-between items-center mb-3 border-b border-purple-700/50 pb-2">
+                        <h4 className="text-sm font-semibold text-purple-300">Professional Edit</h4>
+                        <div className="flex gap-2">
+                          <motion.button
+                            whileHover={{ scale: 1.03 }}
+                            whileTap={{ scale: 0.97 }}
+                            onClick={() => downloadBlob(aiResult.result.structured_edit, `${getSafeFilename(aiResult.title, '_edited')}.txt`)}
+                            className="flex items-center gap-1 rounded border border-purple-600/50 bg-purple-900/30 px-2.5 py-1 text-xs text-purple-300 hover:bg-purple-900/50 transition"
+                          >
+                            <Download className="h-3 w-3" /> .txt
+                          </motion.button>
+                          <motion.button
+                            whileHover={{ scale: 1.03 }}
+                            whileTap={{ scale: 0.97 }}
+                            onClick={() => downloadBlob(aiResult.result.structured_edit, `${getSafeFilename(aiResult.title, '_edited')}.md`, 'text/markdown;charset=utf-8')}
+                            className="flex items-center gap-1 rounded bg-purple-600 px-2.5 py-1 text-xs text-white hover:bg-purple-500 transition"
+                          >
+                            <FileCode className="h-3 w-3" /> .md
+                          </motion.button>
+                        </div>
+                      </div>
+                      <div className="rounded-lg bg-[#0A1832]/60 p-4 text-sm leading-relaxed text-slate-300 whitespace-pre-wrap">
+                        {aiResult.result.structured_edit}
+                      </div>
+                    </div>
+                  ) : aiResult?.result && typeof aiResult.result === 'object' ? (
+                    Object.entries(aiResult.result).map(([key, value]) => (
+                      <div key={key}>
+                        <h4 className="mb-2 text-sm font-semibold text-purple-300 capitalize">{key.replace(/_/g, ' ')}</h4>
+                        <div className="rounded-lg bg-[#0A1832]/60 p-4 text-sm leading-relaxed text-slate-300 whitespace-pre-wrap">
+                          {typeof value === 'string' ? value : JSON.stringify(value, null, 2)}
+                        </div>
+                      </div>
+                    ))
+                  ) : aiResult?.summary ? (
+                    <div className="rounded-lg bg-[#0A1832]/60 p-4 text-sm leading-relaxed text-slate-300 whitespace-pre-wrap">
+                      {aiResult.summary}
+                    </div>
+                  ) : (
+                    <pre className="rounded-lg bg-[#0A1832]/60 p-4 text-xs text-slate-400 overflow-auto max-h-96">
+                      {JSON.stringify(aiResult, null, 2)}
+                    </pre>
+                  )}
+
+                  <div className="flex gap-2 pt-2">
+                    <motion.button
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() => {
+                        const text =
+                          aiResult?.result && typeof aiResult.result === 'object'
+                            ? Object.entries(aiResult.result).map(([k, v]) => `## ${k.replace(/_/g, ' ')}\n\n${typeof v === 'string' ? v : JSON.stringify(v, null, 2)}`).join('\n\n')
+                            : JSON.stringify(aiResult, null, 2);
+                        downloadBlob(text, `${getSafeFilename(data.title, '_analysis')}.md`, 'text/markdown;charset=utf-8');
+                      }}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-purple-400/20 bg-purple-400/[0.06] px-3 py-1.5 text-xs text-purple-300 hover:bg-purple-400/[0.12] transition-all"
+                    >
+                      <Download className="h-3 w-3" /> Download
+                    </motion.button>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}
+
+// ─── Download Options Component ──────────────────────────────────────────────
+
+function DownloadOptions({ data, url }) {
+  const [copied, setCopied] = useState(false);
+
   const transcriptLines = data.transcript_lines || data.transcript || [];
   const plainText = data.plain_text || transcriptLines.map((l) => l.text).join('\n');
   const plainTextWithTimestamps =
@@ -224,7 +401,6 @@ function DownloadOptions({ data, url }) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // fallback
       const ta = document.createElement('textarea');
       ta.value = plainText;
       document.body.appendChild(ta);
@@ -236,36 +412,8 @@ function DownloadOptions({ data, url }) {
     }
   };
 
-  const handleAIAnalysis = async (analysisType) => {
-    setAiLoading(analysisType);
-    setAiResult(null);
-    setAiError('');
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/analyze`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: url, type: analysisType, transcript: plainTextWithTimestamps }),
-      });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.detail || 'Analysis failed');
-      setAiResult(result);
-    } catch (err) {
-      setAiError(err.message);
-    } finally {
-      setAiLoading(null);
-    }
-  };
-
-  const aiButtons = [
-    { type: 'summary', label: 'Summary', icon: '📝' },
-    { type: 'action_points', label: 'Action Points', icon: '🎯' },
-    { type: 'next_steps', label: 'Next Steps', icon: '🚀' },
-    { type: 'structured_edit', label: 'Professional Edit', icon: '✨' },
-  ];
-
   return (
     <div className="space-y-5">
-      {/* Download buttons */}
       <div>
         <h3 className="mb-3 text-sm font-semibold uppercase tracking-[0.12em] text-[#A08040]/70">
           Download
@@ -275,7 +423,7 @@ function DownloadOptions({ data, url }) {
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             onClick={() => downloadBlob(plainTextWithTimestamps, `${getSafeFilename(data.title)}.txt`)}
-            className="inline-flex items-center gap-2 rounded-lg border border-white/[0.08] bg-white/[0.03] px-4 py-2.5 text-sm text-slate-300 hover:border-[#C8A941]/40 hover:bg-[#C8A941]/[0.06] hover:text-[#E8C85A] transition-all"
+            className="inline-flex items-center gap-2 rounded-lg border border-white/[0.08] bg-white/[0.03] px-4 py-2.5 text-sm text-slate-300 hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/[0.06] hover:text-[#F0D060] transition-all"
           >
             <FileText className="h-4 w-4" />
             TXT (timestamps)
@@ -284,7 +432,7 @@ function DownloadOptions({ data, url }) {
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             onClick={() => downloadBlob(plainText, `${getSafeFilename(data.title, '_clean')}.txt`)}
-            className="inline-flex items-center gap-2 rounded-lg border border-white/[0.08] bg-white/[0.03] px-4 py-2.5 text-sm text-slate-300 hover:border-[#C8A941]/40 hover:bg-[#C8A941]/[0.06] hover:text-[#E8C85A] transition-all"
+            className="inline-flex items-center gap-2 rounded-lg border border-white/[0.08] bg-white/[0.03] px-4 py-2.5 text-sm text-slate-300 hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/[0.06] hover:text-[#F0D060] transition-all"
           >
             <FileText className="h-4 w-4" />
             TXT (clean)
@@ -319,9 +467,7 @@ function DownloadOptions({ data, url }) {
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
-            onClick={() =>
-              downloadBlob(JSON.stringify(data, null, 2), `${getSafeFilename(data.title)}.json`, 'application/json')
-            }
+            onClick={() => downloadBlob(JSON.stringify(data, null, 2), `${getSafeFilename(data.title)}.json`, 'application/json')}
             className="inline-flex items-center gap-2 rounded-lg border border-white/[0.08] bg-white/[0.03] px-4 py-2.5 text-sm text-slate-300 hover:border-purple-400/40 hover:bg-purple-400/[0.06] hover:text-purple-300 transition-all"
           >
             <FileCode className="h-4 w-4" />
@@ -331,7 +477,7 @@ function DownloadOptions({ data, url }) {
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             onClick={handleCopy}
-            className="inline-flex items-center gap-2 rounded-lg bg-[#C8A941] px-5 py-2.5 text-sm font-bold text-[#0A1832] hover:bg-[#E8C85A] transition-all shadow-[0_0_20px_rgba(200,169,65,0.2)]"
+            className="inline-flex items-center gap-2 rounded-lg bg-[#D4AF37] px-5 py-2.5 text-sm font-bold text-[#060D1F] hover:bg-[#F0D060] transition-all shadow-[0_0_24px_rgba(212,175,55,0.25)]"
           >
             {copied ? (
               <>
@@ -347,135 +493,6 @@ function DownloadOptions({ data, url }) {
           </motion.button>
         </div>
       </div>
-
-      {/* AI Analysis buttons */}
-      <div className="border-t border-white/[0.06] pt-4">
-        <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.12em] text-purple-300/70">
-          <Sparkles className="h-4 w-4 text-purple-400" />
-          AI Analysis
-        </h3>
-        <div className="flex flex-wrap gap-2.5">
-          {aiButtons.map(({ type, label, icon }) => (
-            <motion.button
-              key={type}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={() => handleAIAnalysis(type)}
-              disabled={!!aiLoading}
-              className="inline-flex items-center gap-2 rounded-lg border border-purple-400/20 bg-purple-400/[0.06] px-4 py-2.5 text-sm text-purple-300 hover:bg-purple-400/[0.12] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_16px_rgba(168,85,247,0.06)]"
-            >
-              {aiLoading === type ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <span>{icon}</span>
-              )}
-              {aiLoading === type ? 'Analyzing...' : label}
-            </motion.button>
-          ))}
-        </div>
-      </div>
-
-      {/* AI Results display */}
-      <AnimatePresence>
-        {(aiResult || aiError) && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3 }}
-            className="rounded-xl border border-purple-400/15 bg-purple-400/[0.04] p-5"
-          >
-            {aiError ? (
-              <p className="text-sm text-red-400">Error: {aiError}</p>
-            ) : (
-              <div className="space-y-4">
-                {/* Professional Edit: special rendering with download buttons */}
-                {aiResult?.analysis_type === 'structured_edit' && aiResult?.result?.structured_edit ? (
-                  <div>
-                    <div className="flex justify-between items-center mb-3 border-b border-purple-700 pb-2">
-                      <h4 className="text-sm font-semibold text-purple-300">Professional Edit</h4>
-                      <div className="flex gap-2">
-                        <motion.button
-                          whileHover={{ scale: 1.03 }}
-                          whileTap={{ scale: 0.97 }}
-                          onClick={() =>
-                            downloadBlob(
-                              aiResult.result.structured_edit,
-                              `${getSafeFilename(aiResult.title, '_edited')}.txt`
-                            )
-                          }
-                          className="flex items-center gap-1 rounded border border-purple-600/50 bg-purple-900/30 px-2.5 py-1 text-xs text-purple-300 hover:bg-purple-900/50 transition"
-                        >
-                          <Download className="h-3 w-3" />
-                          Download .txt
-                        </motion.button>
-                        <motion.button
-                          whileHover={{ scale: 1.03 }}
-                          whileTap={{ scale: 0.97 }}
-                          onClick={() =>
-                            downloadBlob(
-                              aiResult.result.structured_edit,
-                              `${getSafeFilename(aiResult.title, '_edited')}.md`,
-                              'text/markdown;charset=utf-8'
-                            )
-                          }
-                          className="flex items-center gap-1 rounded bg-purple-600 px-2.5 py-1 text-xs text-white hover:bg-purple-500 transition"
-                        >
-                          <FileCode className="h-3 w-3" />
-                          Download .md
-                        </motion.button>
-                      </div>
-                    </div>
-                    <div className="rounded-lg bg-[#0A1832]/60 p-4 text-sm leading-relaxed text-slate-300 whitespace-pre-wrap">
-                      {aiResult.result.structured_edit}
-                    </div>
-                  </div>
-                ) : aiResult?.result && typeof aiResult.result === 'object' ? (
-                  Object.entries(aiResult.result).map(([key, value]) => (
-                    <div key={key}>
-                      <h4 className="mb-2 text-sm font-semibold text-purple-300 capitalize">
-                        {key.replace(/_/g, ' ')}
-                      </h4>
-                      <div className="rounded-lg bg-[#0A1832]/60 p-4 text-sm leading-relaxed text-slate-300 whitespace-pre-wrap">
-                        {typeof value === 'string' ? value : JSON.stringify(value, null, 2)}
-                      </div>
-                    </div>
-                  ))
-                ) : aiResult?.summary ? (
-                  <div className="rounded-lg bg-[#0A1832]/60 p-4 text-sm leading-relaxed text-slate-300 whitespace-pre-wrap">
-                    {aiResult.summary}
-                  </div>
-                ) : (
-                  <pre className="rounded-lg bg-[#0A1832]/60 p-4 text-xs text-slate-400 overflow-auto max-h-96">
-                    {JSON.stringify(aiResult, null, 2)}
-                  </pre>
-                )}
-
-                {/* Copy + Download for AI results */}
-                <div className="flex gap-2 pt-2">
-                  <motion.button
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
-                    onClick={() => {
-                      const text =
-                        aiResult?.result && typeof aiResult.result === 'object'
-                          ? Object.entries(aiResult.result)
-                              .map(([k, v]) => `## ${k.replace(/_/g, ' ')}\n\n${typeof v === 'string' ? v : JSON.stringify(v, null, 2)}`)
-                              .join('\n\n')
-                          : JSON.stringify(aiResult, null, 2);
-                      downloadBlob(text, `${getSafeFilename(data.title, '_analysis')}.md`, 'text/markdown;charset=utf-8');
-                    }}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-purple-400/20 bg-purple-400/[0.06] px-3 py-1.5 text-xs text-purple-300 hover:bg-purple-400/[0.12] transition-all"
-                  >
-                    <Download className="h-3 w-3" />
-                    Download
-                  </motion.button>
-                </div>
-              </div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }
@@ -620,6 +637,7 @@ function App() {
 
   return (
     <motion.main
+      id="main-content"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
@@ -637,22 +655,25 @@ function App() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.5 }}
-                className="card-highlight rounded-2xl border border-white/[0.06] glassmorphism p-6 sm:p-10 shadow-[0_0_40px_rgba(200,169,65,0.06),0_8px_32px_rgba(0,0,0,0.2)]"
+                className="neon-border-card rounded-2xl border border-white/[0.08] glassmorphism p-6 sm:p-10 shadow-[0_0_50px_rgba(212,175,55,0.05),0_8px_32px_rgba(0,0,0,0.25)]"
               >
-                <form className="space-y-6" onSubmit={handleExtract}>
+                <form className="space-y-6" onSubmit={handleExtract} role="form" aria-label="YouTube transcript extraction">
                   {/* URL Input */}
                   <div>
-                    <label className="mb-2.5 block text-xs font-semibold uppercase tracking-[0.16em] text-[#A08040]/80">
+                    <label htmlFor="youtube-url" className="mb-2.5 block text-xs font-semibold uppercase tracking-[0.16em] text-[#A08040]/90">
                       YouTube URL
                     </label>
                     <div className="group relative">
-                      <div className="flex items-center gap-3 rounded-xl border border-white/[0.08] bg-[#0A1832]/60 backdrop-blur-sm px-4 py-3.5 transition-all focus-within:border-[#C8A941]/60 focus-within:ring-2 focus-within:ring-[#C8A941]/10 focus-within:shadow-[0_0_20px_rgba(200,169,65,0.06)]">
-                        <Link2 className="h-5 w-5 text-[#A08040]/60 group-focus-within:text-[#C8A941] transition-colors" />
+                      <div className="flex items-center gap-3 rounded-xl border border-white/[0.1] bg-[#060D1F]/70 backdrop-blur-sm px-4 py-4 transition-all focus-within:border-[#D4AF37]/60 focus-within:ring-2 focus-within:ring-[#D4AF37]/15 focus-within:shadow-[0_0_24px_rgba(212,175,55,0.08)]">
+                        <Link2 className="h-5 w-5 text-[#A08040]/70 group-focus-within:text-[#D4AF37] transition-colors" />
                         <input
-                          className="w-full bg-transparent text-base text-slate-100 outline-none placeholder:text-slate-500/60"
+                          id="youtube-url"
+                          className="w-full bg-transparent text-base text-slate-100 outline-none placeholder:text-slate-500/50"
                           placeholder="https://www.youtube.com/watch?v=..."
                           value={url}
                           onChange={(event) => setUrl(event.target.value)}
+                          aria-label="YouTube video URL"
+                          autoComplete="url"
                         />
                       </div>
                     </div>
@@ -660,29 +681,33 @@ function App() {
 
                   {/* Language & Submit */}
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-                    <label className="flex items-center gap-3 text-sm text-slate-400">
+                    <label htmlFor="transcript-language" className="flex items-center gap-3 text-sm text-slate-400">
                       <span className="text-slate-500 font-medium">Language</span>
                       <input
-                        className="w-20 rounded-lg border border-white/[0.08] bg-[#0A1832]/60 px-3 py-2 text-sm lowercase text-slate-100 outline-none focus:border-[#00D4FF]/60 transition-colors"
+                        id="transcript-language"
+                        className="w-20 rounded-lg border border-white/[0.08] bg-[#060D1F]/70 px-3 py-2 text-sm lowercase text-slate-100 outline-none focus:border-[#00D4FF]/60 transition-colors"
                         value={language}
                         onChange={(event) => setLanguage(event.target.value)}
                         maxLength={10}
+                        aria-label="Transcript language code (e.g. en, es, fr)"
                       />
                     </label>
 
                     <motion.button
                       type="submit"
                       disabled={loading}
-                      whileHover={{ scale: 1.02 }}
+                      whileHover={{ scale: 1.02, boxShadow: '0 8px 40px rgba(212,175,55,0.35), 0 0 60px rgba(212,175,55,0.1)' }}
                       whileTap={{ scale: 0.98 }}
-                      className="inline-flex items-center justify-center gap-2.5 rounded-xl btn-gold px-7 py-3.5 text-sm font-bold text-[#0A1832] disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:shadow-none"
+                      className="relative inline-flex items-center justify-center gap-2.5 rounded-xl btn-gold px-8 py-4 text-sm font-bold text-[#060D1F] disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:shadow-none overflow-hidden group"
                     >
+                      {/* Shimmer overlay */}
+                      <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
                       {loading ? (
-                        <Loader2 className="h-5 w-5 animate-spin" />
+                        <Loader2 className="h-5 w-5 animate-spin relative z-10" />
                       ) : (
-                        <FileText className="h-5 w-5" />
+                        <FileText className="h-5 w-5 relative z-10" />
                       )}
-                      {loading ? 'Extracting...' : 'Extract Transcript'}
+                      <span className="relative z-10">{loading ? 'Extracting...' : 'Extract Transcript'}</span>
                     </motion.button>
                   </div>
                 </form>
@@ -694,14 +719,23 @@ function App() {
                   {/* Video Info */}
                   <VideoInfo data={normalizedResult} />
 
-                  {/* Download Options + AI Analysis */}
+                  {/* Download Options */}
                   <motion.section
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.1 }}
-                    className="rounded-2xl border border-white/[0.06] glassmorphism p-6 shadow-[0_0_30px_rgba(168,85,247,0.03)]"
+                    className="rounded-2xl border border-white/[0.08] glassmorphism p-6 shadow-[0_0_40px_rgba(212,175,55,0.04)]"
                   >
                     <DownloadOptions data={normalizedResult} url={url} />
+                  </motion.section>
+
+                  {/* AI Analysis — standalone premium card */}
+                  <motion.section
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.15 }}
+                  >
+                    <AIAnalysisCard data={normalizedResult} url={url} />
                   </motion.section>
 
                   {/* Transcript with Search */}

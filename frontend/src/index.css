@@ -8,24 +8,24 @@
 @layer base {
   :root {
     /* E.T.D Brand — Navy backgrounds */
-    --background: 215 67% 11%; /* #0A1832 */
+    --background: 215 70% 8%; /* #060D1F — deeper */
     --foreground: 0 0% 98%;
 
-    --card: 217 57% 16%; /* #122240 */
+    --card: 217 57% 14%; /* #0D1A30 — richer */
     --card-foreground: 0 0% 98%;
 
     --popover: 217 57% 16%; /* #122240 */
     --popover-foreground: 0 0% 98%;
 
-    /* E.T.D Brand — Gold primary */
-    --primary: 47 60% 52%; /* #C8A941 */
-    --primary-foreground: 215 67% 11%; /* navy — dark text on gold */
+    /* E.T.D Brand — Gold primary — refined */
+    --primary: 47 65% 54%; /* #D4AF37 — warmer, more premium */
+    --primary-foreground: 215 70% 8%; /* deep navy — dark text on gold */
 
     /* E.T.D Brand — Navy-mid secondary */
-    --secondary: 217 57% 16%; /* #122240 */
+    --secondary: 217 57% 14%; /* #0D1A30 */
     --secondary-foreground: 0 0% 98%;
 
-    --muted: 217 50% 20%; /* slightly lighter navy */
+    --muted: 217 50% 18%; /* slightly lighter navy */
     --muted-foreground: 0 0% 60%;
 
     --accent: 217 50% 20%;
@@ -70,11 +70,11 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Satoshi', system-ui, -apple-system, sans-serif;
-    /* Dramatic radial gradient background — hero light source */
-    background: radial-gradient(ellipse at 50% 0%, rgba(18, 34, 64, 0.9) 0%, transparent 60%),
-                radial-gradient(ellipse at 80% 20%, rgba(0, 60, 100, 0.25) 0%, transparent 50%),
-                radial-gradient(ellipse at 20% 80%, rgba(200, 169, 65, 0.04) 0%, transparent 50%),
-                #0A1832;
+    /* Deeper, more dramatic radial gradient background */
+    background: radial-gradient(ellipse at 50% 0%, rgba(13, 26, 48, 0.95) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(0, 50, 90, 0.3) 0%, transparent 50%),
+                radial-gradient(ellipse at 20% 80%, rgba(212, 175, 55, 0.03) 0%, transparent 50%),
+                #060D1F;
     min-height: 100vh;
   }
 
@@ -82,6 +82,29 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+  }
+
+  /* ─── Focus-visible styles for keyboard navigation (accessibility) ─── */
+  *:focus-visible {
+    outline: 2px solid #D4AF37;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Skip-to-content link for screen readers */
+  .skip-link {
+    position: absolute;
+    top: -100%;
+    left: 0;
+    padding: 12px 24px;
+    background: #D4AF37;
+    color: #060D1F;
+    font-weight: 700;
+    z-index: 9999;
+    transition: top 0.2s;
+  }
+  .skip-link:focus {
+    top: 0;
   }
 
   /* ─── E.T.D Watermark — subtle body-level logo ─── */
@@ -180,19 +203,71 @@
   }
   @keyframes gradientMove { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
 
+  /* ─── Animated gradient (Magic-ui compatible) ─── */
+  .animate-gradient {
+    animation: animatedGradient 3s linear infinite;
+  }
+  @keyframes animatedGradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* ─── Shimmer sweep — for borders and badges ─── */
+  .shimmer-sweep {
+    position: relative;
+    overflow: hidden;
+  }
+  .shimmer-sweep::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(212, 175, 55, 0.08) 50%, transparent 100%);
+    animation: shimmerSweep 3s infinite;
+  }
+  @keyframes shimmerSweep {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  /* ─── Neon border card (Magic-ui inspired) ─── */
+  .neon-border-card {
+    position: relative;
+    border-radius: 16px;
+  }
+  .neon-border-card::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(212,175,55,0.3), rgba(0,212,255,0.2), rgba(168,85,247,0.2));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: neonRotate 6s linear infinite;
+    pointer-events: none;
+  }
+  @keyframes neonRotate {
+    0% { background: linear-gradient(0deg, rgba(212,175,55,0.3), rgba(0,212,255,0.2), rgba(168,85,247,0.2)); }
+    33% { background: linear-gradient(120deg, rgba(212,175,55,0.3), rgba(0,212,255,0.2), rgba(168,85,247,0.2)); }
+    66% { background: linear-gradient(240deg, rgba(212,175,55,0.3), rgba(0,212,255,0.2), rgba(168,85,247,0.2)); }
+    100% { background: linear-gradient(360deg, rgba(212,175,55,0.3), rgba(0,212,255,0.2), rgba(168,85,247,0.2)); }
+  }
+
   /* ─── Gold gradient button ─── */
   .btn-gold {
-    background: linear-gradient(135deg, #E8C85A 0%, #C8A941 50%, #8B7229 100%);
-    box-shadow: 0 4px 14px rgba(200, 169, 65, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    background: linear-gradient(135deg, #F0D060 0%, #D4AF37 50%, #8B7229 100%);
+    box-shadow: 0 4px 16px rgba(212, 175, 55, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.15);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
   .btn-gold:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 24px rgba(200, 169, 65, 0.45), 0 0 40px rgba(200, 169, 65, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(212, 175, 55, 0.5), 0 0 50px rgba(212, 175, 55, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2);
   }
   .btn-gold:active {
     transform: translateY(0);
-    box-shadow: 0 2px 8px rgba(200, 169, 65, 0.2);
+    box-shadow: 0 2px 8px rgba(212, 175, 55, 0.2);
   }
 
   /* ─── Feature pill glow ─── */
