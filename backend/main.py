@@ -177,6 +177,11 @@ Format using clear Markdown headers (##)."""
         "max_tokens": max_tokens,
     }
 
+    # Log the request details for debugging
+    logger.info(f"KILO API request: model={config['model']}, analysis_type={analysis_type}, "
+                f"max_tokens={max_tokens}, prompt_chars={len(user_prompt)}, "
+                f"base_url={config['base_url']}")
+
     req = urllib.request.Request(
         api_url,
         data=__import__("json").dumps(payload).encode("utf-8"),
@@ -190,7 +195,13 @@ Format using clear Markdown headers (##)."""
     try:
         with urllib.request.urlopen(req, timeout=300) as resp:
             data = __import__("json").loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        # Log the full error body from KILO API
+        error_body = exc.read().decode("utf-8", errors="replace")[:500] if exc.fp else str(exc)
+        logger.error(f"KILO API HTTPError: {exc.code} {exc.reason} - body: {error_body}")
+        raise ValueError(f"KILO API returned HTTP {exc.code}: {error_body}")
     except Exception as exc:
+        logger.error(f"KILO API call failed ({type(exc).__name__}): {exc}")
         raise ValueError(f"KILO API call failed: {exc}")
 
     content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
@@ -370,8 +381,12 @@ async def analyze_transcript_endpoint(request: AnalyzeRequest):
 
     # Then analyze with KILO (pass description + links for context)
     try:
+        logger.info(f"Starting KILO analysis: video_id={video_id}, type={request.type}, "
+                    f"transcript_chars={len(transcript_text)}")
         analysis = analyze_with_kilo(transcript_text, request.type, description=description, links=links)
+        logger.info(f"KILO analysis succeeded: video_id={video_id}, type={request.type}")
     except ValueError as exc:
+        logger.error(f"KILO analysis FAILED: video_id={video_id}, type={request.type}, error={exc}")
         raise HTTPException(status_code=502, detail=str(exc))
 
     return AnalyzeResponse(
