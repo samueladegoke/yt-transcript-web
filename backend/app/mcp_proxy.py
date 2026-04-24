@@ -21,7 +21,7 @@ mcp = FastMCP("youtube-transcript-proxy")
 # Override with RENDER_BACKEND_URL env var for remote backends
 RENDER_BACKEND_URL = os.getenv(
     "RENDER_BACKEND_URL",
-    "http://localhost:8000"
+    "https://yt-transcript-api-hzk2.onrender.com"
 )
 
 
